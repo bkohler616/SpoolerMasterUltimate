@@ -1,0 +1,99 @@
+﻿<Window x:Class="SpoolerMasterUltimate.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SpoolerMasterUltimate"
+        mc:Ignorable="d"
+        Title="TimeOverlay"
+        MinHeight="50"
+        MinWidth="100"
+        WindowStyle="None"
+        ShowInTaskbar="False"
+        AllowsTransparency="True"
+        Background="Transparent"
+        MouseDown="Window_MouseDown"
+        Topmost="True"
+        Closing="MainWindow_OnClosing"
+        SizeToContent="WidthAndHeight"
+		  ResizeMode="NoResize"
+		  IsHitTestVisible="True"
+		  Name="WinMainWindowHandler">
+    <Border Name="BrdrBackground"
+	        CornerRadius="20"
+	        Background="#000000"
+	        Opacity="50">
+
+        <Border BorderBrush="Transparent"
+		        BorderThickness="5"
+		        CornerRadius="10">
+            <StackPanel 
+			            Margin="10,0,10,10">
+                <Label Name="LblDate"
+							  VerticalAlignment="Top"
+								HorizontalAlignment="Left"
+				       Foreground="Gray"
+				       FontSize="15"
+				       Loaded="LblDate_OnLoaded" />
+                <Label Name="LblTime"
+							  VerticalAlignment="Top"
+								HorizontalAlignment="Left"
+				       Foreground="White"
+				       FontSize="30"
+				       Loaded="LblTime_OnLoaded" />
+					 <Label VerticalAlignment="Bottom"
+							  HorizontalAlignment="Right"
+							  Name="lblPrinterStatus"
+							  Content="Printer Status Loading"
+							  Foreground="White"
+							  FontSize="30"/>
+					 <DataGrid
+						  Name="dgPrintMonitor"
+						  VerticalAlignment="Bottom"
+						  HorizontalAlignment="Right"
+						  Height="100"
+						  VerticalScrollBarVisibility="Auto"
+						  CanUserAddRows="False"
+						  CanUserReorderColumns="False"
+						  CanUserDeleteRows="False"
+						  CanUserResizeColumns="True"
+						  CanUserResizeRows="False"
+						  CanUserSortColumns="False"
+						  IsReadOnly="True">
+						  <DataGrid.Columns>
+								<DataGridTextColumn Header="JobId"/>
+								<DataGridTextColumn Header="DocumentName"/>
+								<DataGridTextColumn Header="Status"/>
+								<DataGridTextColumn Header="Pages"/>
+								<DataGridTextColumn Header="Size"/>
+						  </DataGrid.Columns>
+					 </DataGrid>
+					 <WrapPanel FlowDirection="LeftToRight"
+									VerticalAlignment="Bottom"
+									HorizontalAlignment="Right">
+						  <Button Content="Delete"
+									 Click="PrintJobDelete_OnClick"
+									 Margin="5,5,5,5"
+									 Width="100"/>
+						  <Button Content="Pause/unpause"
+									 Click="PrintJobPause_OnClick"
+									 Margin="5,5,5,5"
+									 Width="100"></Button>
+					 </WrapPanel>
+            </StackPanel>
+            
+        </Border>
+        <Border.ContextMenu>
+            <ContextMenu>
+                <MenuItem Click="CloseOverlay_Click"
+				          Header="_Close" />
+                <MenuItem Click="ShowSettings_Click"
+				          Header="_Settings" />
+                <MenuItem Click="ShowAbout_Click"
+				          Header="_About" />
+					 <MenuItem Click="SetPrinter_OnClick"
+						  Header="_Set Printer"></MenuItem>
+            </ContextMenu>
+        </Border.ContextMenu>
+    </Border>
+</Window>

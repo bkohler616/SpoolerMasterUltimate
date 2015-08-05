@@ -1,0 +1,53 @@
+﻿<Window x:Class="SpoolerMasterUltimate.About"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SpoolerMasterUltimate"
+        mc:Ignorable="d"
+        Closing="About_OnClosing"
+        Title="About"
+        Height="260"
+        Width="350"
+		  ResizeMode="NoResize"
+		  Topmost="True">
+    <WrapPanel FlowDirection="LeftToRight">
+        <Image Width="100"
+		       Height="100"
+				 x:Name ="ImageDisplay"
+		       HorizontalAlignment="Left"
+		       Margin="5,5,5,5"  />
+        <TextBlock>
+			<TextBlock Name="PreNameText"
+			           TextWrapping="Wrap" />
+			<LineBreak />
+			<Hyperlink RequestNavigate="BenWebsite_OnRequestNavigate"
+						  NavigateUri="http://BenKohler.com">
+				<TextBlock Name="AppDevName"
+				           TextWrapping="Wrap" />
+			</Hyperlink>
+			<LineBreak />
+			<TextBlock Name="VersionNumber"
+			           TextWrapping="Wrap" />
+		</TextBlock>
+
+        <TextBlock Margin="5,5,5,5">
+			<Hyperlink RequestNavigate="GithubLinkTimeOverlay_OnRequestNavigate"
+			           NavigateUri="http://github.com/riku12124/TimeOverlay">
+				<TextBlock Name="GithubLinkTimeOverlay"
+				           TextWrapping="Wrap" />
+			</Hyperlink>
+		</TextBlock>
+        <TextBlock Margin="5,5,5,5">
+			<Hyperlink RequestNavigate="GithubLinkSpoolerMasterUltimate_OnRequestNavigate"
+			           NavigateUri="http://github.com/riku12124/SpoolerMasterUltimate">
+				<TextBlock Name="GithubLinkSpoolerMasterUltimate"
+				           TextWrapping="Wrap" />
+			</Hyperlink>
+		</TextBlock>
+        <TextBlock Name="ApplicationDesc"
+		           TextWrapping="Wrap"
+		           Text="Temp3"
+		           Margin="5,5,5,5" />
+    </WrapPanel>
+</Window>
