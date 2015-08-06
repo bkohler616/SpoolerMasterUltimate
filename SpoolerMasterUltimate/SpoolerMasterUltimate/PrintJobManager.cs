@@ -1,65 +1,62 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing.Printing;
 using System.Printing;
+using System.Windows;
 
 namespace SpoolerMasterUltimate {
 	internal class PrintJobManager {
-		private readonly SelectPrinterWindow printerWindow;
-		private PrintQueue mainPrintQueue;
-		public bool PrinterConnection { get; set; } = false;
+		private PrintQueue _mainPrintQueue;
 
 		public PrintJobManager() {
-			printerWindow = new SelectPrinterWindow();
+			PrinterWindow = new SelectPrinterWindow();
 			GetNewPrinter();
 		}
 
+		public bool PrinterConnection { get; set; }
+		public SelectPrinterWindow PrinterWindow { get; }
+
 		public void GetNewPrinter() {
 			var printers = PrinterSettings.InstalledPrinters;
-			printerWindow.GetNewPrinters(printers);
+			PrinterWindow.GetNewPrinters(printers);
 		}
-
-		public void PopulatePrinterInformation() {
-				
-			UpdatePrintQueue();
-		}
-
-		public SelectPrinterWindow PrinterWindow => printerWindow;
 
 		public void UpdatePrintQueue() {
-				PrintServer mainPrintServer = new PrintServer(printerWindow.PrinterSelection);
-				PrintQueueCollection pqc = mainPrintServer.GetPrintQueues();
-			foreach (PrintQueue pq in pqc) {
-				if (pq.FullName == printerWindow.PrinterSelection)
-					mainPrintQueue = pq;
+			var mainPrintServer = new PrintServer(PrinterWindow.PrinterSelection);
+			var pqc = mainPrintServer.GetPrintQueues();
+			var printQueues = "Print Queues Found:";
+			foreach (var pq in pqc) {
+				printQueues += "\n" + pq.Name;
+				if (pq.FullName == PrinterWindow.PrinterSelection) {
+					_mainPrintQueue = pq;
+					PrinterConnection = true;
+				}
 			}
+			MessageBox.Show(printQueues);
 		}
 
 		public void DeletePrintQueues(IList printData) {
 			foreach (DataRowView row in printData) {
-				int jobId = int.Parse( row["JobId"].ToString());
-				
-					mainPrintQueue.GetJob(jobId).Cancel();
+				var jobId = int.Parse(row["JobId"].ToString());
+
+				_mainPrintQueue.GetJob(jobId).Cancel();
 			}
 		}
 
 		public void PausePrinteQueues(IList printData) {
 			foreach (DataRowView row in printData) {
-				int jobId = int.Parse(row["JobId"].ToString());
-					if(mainPrintQueue.GetJob(jobId).IsPaused)
-								mainPrintQueue.GetJob(jobId).Resume();
-					else {
-						mainPrintQueue.GetJob(jobId).Pause();
-					}
+				var jobId = int.Parse(row["JobId"].ToString());
+				if (_mainPrintQueue.GetJob(jobId).IsPaused)
+					_mainPrintQueue.GetJob(jobId).Resume();
+				else _mainPrintQueue.GetJob(jobId).Pause();
 			}
 		}
 
-		public List<PrintJobData> getPrintData() {
-			List<PrintJobData> printJobs = new List<PrintJobData>();
-			foreach (var job in mainPrintQueue.GetPrintJobInfoCollection()) {
-				PrintJobData jobDataBuilder = new PrintJobData {
+		public List<PrintJobData> GetPrintData() {
+			var printJobs = new List<PrintJobData>();
+			foreach (var job in _mainPrintQueue.GetPrintJobInfoCollection()) {
+				var jobDataBuilder = new PrintJobData {
 					DocumentName = job.JobName,
 					JobId = job.JobIdentifier,
 					Size = job.JobSize.ToString(),
@@ -69,6 +66,25 @@ namespace SpoolerMasterUltimate {
 				printJobs.Add(jobDataBuilder);
 			}
 			return printJobs;
-		} 
+		}
+
+		public string CurrentPrinterStatus() {
+			if (PrinterConnection == false)
+				return "No connection established.";
+			if (_mainPrintQueue.IsOffline)
+				return "Printer Offline";
+			if (_mainPrintQueue.IsDoorOpened)
+				return "Printer Door Opened";
+			if (_mainPrintQueue.IsPaperJammed)
+				return "Printer Jammed";
+			if (_mainPrintQueue.HasPaperProblem)
+				return "Unknown paper problem";
+			if (_mainPrintQueue.IsOutOfPaper)
+				return "Printer out of paper";
+			if (_mainPrintQueue.NeedUserIntervention)
+				return "Printer needs love.";
+			return _mainPrintQueue.NumberOfJobs + " jobs, " +
+			       (_mainPrintQueue.QueueStatus.ToString() == "None" ? "No Print Issues" : _mainPrintQueue.QueueStatus.ToString());
+		}
 	}
 }

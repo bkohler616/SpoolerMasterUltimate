@@ -47,7 +47,7 @@
 							  Content="Printer Status Loading"
 							  Foreground="White"
 							  FontSize="30"/>
-					 <DataGrid
+                <DataGrid
 						  Name="dgPrintMonitor"
 						  VerticalAlignment="Bottom"
 						  HorizontalAlignment="Right"
@@ -60,14 +60,7 @@
 						  CanUserResizeRows="False"
 						  CanUserSortColumns="False"
 						  IsReadOnly="True">
-						  <DataGrid.Columns>
-								<DataGridTextColumn Header="JobId"/>
-								<DataGridTextColumn Header="DocumentName"/>
-								<DataGridTextColumn Header="Status"/>
-								<DataGridTextColumn Header="Pages"/>
-								<DataGridTextColumn Header="Size"/>
-						  </DataGrid.Columns>
-					 </DataGrid>
+                </DataGrid>
 					 <WrapPanel FlowDirection="LeftToRight"
 									VerticalAlignment="Bottom"
 									HorizontalAlignment="Right">

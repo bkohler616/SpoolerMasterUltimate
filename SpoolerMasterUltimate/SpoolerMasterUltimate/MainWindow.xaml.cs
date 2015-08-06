@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
@@ -17,12 +12,12 @@ namespace SpoolerMasterUltimate {
 	/// <summary>
 	///     Interaction logic for MainWindow.xaml
 	/// </summary>
-	public partial class MainWindow : Window {
+	public partial class MainWindow {
 		private static string _path;
 		private readonly About _aboutWindow;
+		private readonly PrintJobManager _printManager;
 		private readonly SettingsWindow _settingsWindowAccess;
 		private readonly Timer _updateTime;
-		private readonly PrintJobManager printManager;
 		private DateTime _currentDateTime;
 
 		public MainWindow() {
@@ -47,7 +42,7 @@ namespace SpoolerMasterUltimate {
 			_settingsWindowAccess.Settings.CloseApplication = false;
 			_settingsWindowAccess.Hide();
 
-			printManager = new PrintJobManager();
+			_printManager = new PrintJobManager();
 		}
 
 		/// <summary>
@@ -79,19 +74,19 @@ namespace SpoolerMasterUltimate {
 			LblTime.Content = _currentDateTime.ToString("hh:mm:ss tt");
 			LblTime.FontSize = _settingsWindowAccess.Settings.TimeFontSize;
 			LblDate.FontSize = _settingsWindowAccess.Settings.DateFontSize;
-			BrdrBackground.Background.Opacity = (_settingsWindowAccess.Settings.WindowOpacityPercentage/100.0);
+			BrdrBackground.Background.Opacity = (_settingsWindowAccess.Settings.WindowOpacityPercentage / 100.0);
 			WinMainWindowHandler.IsHitTestVisible = _settingsWindowAccess.Settings.ClickThrough;
 		}
 
 		private void PrinterUpdate() {
-			if (printManager.PrinterWindow.PrinterGet) {
-				printManager.PrinterWindow.PrinterGet = false;
-				printManager.PopulatePrinterInformation();
+			if (_printManager.PrinterWindow.PrinterGet) {
+				_printManager.PrinterWindow.PrinterGet = false;
+				_printManager.UpdatePrintQueue();
 			}
-			if (printManager.PrinterConnection) {
-				setPrintStatus();
-			}
-		}
+			else if (_printManager.PrinterConnection) SetPrintStatus();
+
+				lblPrinterStatus.Content = _printManager.CurrentPrinterStatus();
+		  }
 
 		/// <summary>
 		///     On mouse down, move the whole window. (does not work if hit-click check is disabled)
@@ -162,22 +157,22 @@ namespace SpoolerMasterUltimate {
 		}
 
 		private void SetPrinter_OnClick(object sender, RoutedEventArgs e) {
-			printManager.GetNewPrinter();
-			printManager.PrinterWindow.Show();
+			_printManager.GetNewPrinter();
+			_printManager.PrinterWindow.Show();
 		}
-		  
+
 		private void PrintJobDelete_OnClick(object sender, RoutedEventArgs e) {
-			printManager.DeletePrintQueues(dgPrintMonitor.SelectedItems);
-				
+			_printManager.DeletePrintQueues(dgPrintMonitor.SelectedItems);
 		}
 
 		private void PrintJobPause_OnClick(object sender, RoutedEventArgs e) {
-			printManager.PausePrinteQueues(dgPrintMonitor.SelectedItems);
+			_printManager.PausePrinteQueues(dgPrintMonitor.SelectedItems);
 		}
 
-		private void setPrintStatus() {
-			var printData = printManager.getPrintData();
-			dgPrintMonitor.DataContext = printData;
+		private void SetPrintStatus() {
+			var printData = _printManager.GetPrintData();
+			dgPrintMonitor.ItemsSource = printData;
+			
 		}
 	}
 }
