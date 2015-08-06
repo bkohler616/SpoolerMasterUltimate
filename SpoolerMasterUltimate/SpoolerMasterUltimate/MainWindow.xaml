@@ -16,77 +16,76 @@
         Topmost="True"
         Closing="MainWindow_OnClosing"
         SizeToContent="WidthAndHeight"
-		  ResizeMode="NoResize"
-		  IsHitTestVisible="True"
-		  Name="WinMainWindowHandler">
-    <Border Name="BrdrBackground"
+        ResizeMode="NoResize"
+        IsHitTestVisible="True"
+        Name="WinMainWindowHandler">
+	<Border Name="BrdrBackground"
 	        CornerRadius="20"
 	        Background="#000000"
 	        Opacity="50">
 
-        <Border BorderBrush="Transparent"
+		<Border BorderBrush="Transparent"
 		        BorderThickness="5"
 		        CornerRadius="10">
-            <StackPanel 
-			            Margin="10,0,10,10">
-                <Label Name="LblDate"
-							  VerticalAlignment="Top"
-								HorizontalAlignment="Left"
+			<StackPanel
+				Margin="10,0,10,10">
+				<Label Name="LblDate"
+				       VerticalAlignment="Top"
+				       HorizontalAlignment="Left"
 				       Foreground="Gray"
 				       FontSize="15"
 				       Loaded="LblDate_OnLoaded" />
-                <Label Name="LblTime"
-							  VerticalAlignment="Top"
-								HorizontalAlignment="Left"
+				<Label Name="LblTime"
+				       VerticalAlignment="Top"
+				       HorizontalAlignment="Left"
 				       Foreground="White"
 				       FontSize="30"
 				       Loaded="LblTime_OnLoaded" />
-					 <Label VerticalAlignment="Bottom"
-							  HorizontalAlignment="Right"
-							  Name="lblPrinterStatus"
-							  Content="Printer Status Loading"
-							  Foreground="White"
-							  FontSize="30"/>
-                <DataGrid
-						  Name="dgPrintMonitor"
-						  VerticalAlignment="Bottom"
-						  HorizontalAlignment="Right"
-						  Height="100"
-						  VerticalScrollBarVisibility="Auto"
-						  CanUserAddRows="False"
-						  CanUserReorderColumns="False"
-						  CanUserDeleteRows="False"
-						  CanUserResizeColumns="True"
-						  CanUserResizeRows="False"
-						  CanUserSortColumns="False"
-						  IsReadOnly="True">
-                </DataGrid>
-					 <WrapPanel FlowDirection="LeftToRight"
-									VerticalAlignment="Bottom"
-									HorizontalAlignment="Right">
-						  <Button Content="Delete"
-									 Click="PrintJobDelete_OnClick"
-									 Margin="5,5,5,5"
-									 Width="100"/>
-						  <Button Content="Pause/unpause"
-									 Click="PrintJobPause_OnClick"
-									 Margin="5,5,5,5"
-									 Width="100"></Button>
-					 </WrapPanel>
-            </StackPanel>
-            
-        </Border>
-        <Border.ContextMenu>
-            <ContextMenu>
-                <MenuItem Click="CloseOverlay_Click"
+				<Label VerticalAlignment="Bottom"
+				       HorizontalAlignment="Right"
+				       Name="lblPrinterStatus"
+				       Content="Printer Status Loading"
+				       Foreground="White"
+				       FontSize="30" />
+				<DataGrid
+					Name="dgPrintMonitor"
+					VerticalAlignment="Bottom"
+					HorizontalAlignment="Right"
+					Height="100"
+					VerticalScrollBarVisibility="Auto"
+					CanUserAddRows="False"
+					CanUserReorderColumns="False"
+					CanUserDeleteRows="False"
+					CanUserResizeColumns="True"
+					CanUserResizeRows="False"
+					CanUserSortColumns="False"
+					IsReadOnly="True" />
+				<WrapPanel FlowDirection="LeftToRight"
+				           VerticalAlignment="Bottom"
+				           HorizontalAlignment="Right">
+					<Button Content="Delete"
+					        Click="PrintJobDelete_OnClick"
+					        Margin="5,5,5,5"
+					        Width="100" />
+					<Button Content="Pause/unpause"
+					        Click="PrintJobPause_OnClick"
+					        Margin="5,5,5,5"
+					        Width="100" />
+				</WrapPanel>
+			</StackPanel>
+
+		</Border>
+		<Border.ContextMenu>
+			<ContextMenu>
+				<MenuItem Click="CloseOverlay_Click"
 				          Header="_Close" />
-                <MenuItem Click="ShowSettings_Click"
+				<MenuItem Click="ShowSettings_Click"
 				          Header="_Settings" />
-                <MenuItem Click="ShowAbout_Click"
+				<MenuItem Click="ShowAbout_Click"
 				          Header="_About" />
-					 <MenuItem Click="SetPrinter_OnClick"
-						  Header="_Set Printer"></MenuItem>
-            </ContextMenu>
-        </Border.ContextMenu>
-    </Border>
+				<MenuItem Click="SetPrinter_OnClick"
+				          Header="_Set Printer" />
+			</ContextMenu>
+		</Border.ContextMenu>
+	</Border>
 </Window>

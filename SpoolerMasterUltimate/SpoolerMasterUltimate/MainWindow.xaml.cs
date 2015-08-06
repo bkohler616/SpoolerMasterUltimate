@@ -85,8 +85,8 @@ namespace SpoolerMasterUltimate {
 			}
 			else if (_printManager.PrinterConnection) SetPrintStatus();
 
-				lblPrinterStatus.Content = _printManager.CurrentPrinterStatus();
-		  }
+			lblPrinterStatus.Content = _printManager.CurrentPrinterStatus();
+		}
 
 		/// <summary>
 		///     On mouse down, move the whole window. (does not work if hit-click check is disabled)
@@ -172,7 +172,6 @@ namespace SpoolerMasterUltimate {
 		private void SetPrintStatus() {
 			var printData = _printManager.GetPrintData();
 			dgPrintMonitor.ItemsSource = printData;
-			
 		}
 	}
 }

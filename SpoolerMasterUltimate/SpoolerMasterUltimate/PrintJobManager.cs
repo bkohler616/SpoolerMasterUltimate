@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing.Printing;
 using System.Printing;
-using System.Printing.IndexedProperties;
 using System.Windows;
 
 namespace SpoolerMasterUltimate {
@@ -31,7 +30,11 @@ namespace SpoolerMasterUltimate {
 			/*_mainPrintQueue =
 				mainPrintServer.GetPrintQueue(PrinterSettings.InstalledPrinters[PrinterWindow.PrinterSelectionIndex]);*/ // 
 
-				//The following works for local printer connections just fine.
+			//The following works for local printer connections just fine.
+			/*
+					 Network Error: mainPrintServer null reference exception.
+					 Dig deeper: main Print server object initialization failure. Cannot find spcified file
+				*/
 			var pqc = mainPrintServer.GetPrintQueues();
 			MessageBox.Show("Print Queues recieved");
 			var printQueues = "Print Queues Found:";

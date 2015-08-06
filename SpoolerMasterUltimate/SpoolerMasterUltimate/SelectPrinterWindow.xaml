@@ -6,19 +6,20 @@
         xmlns:local="clr-namespace:SpoolerMasterUltimate"
         mc:Ignorable="d"
         Title="Select Printer" Height="80" Width="284.921"
-		  Closing="SelectPrinterWindow_OnClosing"
-		  ResizeMode="NoResize">
+        Closing="SelectPrinterWindow_OnClosing"
+        ResizeMode="NoResize">
 	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition />
 			<ColumnDefinition />
 		</Grid.ColumnDefinitions>
-		<ComboBox x:Name="cbPrinterSelection" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120" Margin="10,10,0,0" Grid.Column="0">
-			 <ComboBoxItem Content="test"/>
+		<ComboBox x:Name="cbPrinterSelection" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120"
+		          Margin="10,10,0,0" Grid.Column="0">
+			<ComboBoxItem Content="test" />
 		</ComboBox>
-		 <Button x:Name="btnAccept" Grid.Column ="1" Margin="10,10,10,10"
-					Content="Accept"
-					Click="AcceptButton_OnClick"/>
+		<Button x:Name="btnAccept" Grid.Column="1" Margin="10,10,10,10"
+		        Content="Accept"
+		        Click="AcceptButton_OnClick" />
 
 	</Grid>
 </Window>
