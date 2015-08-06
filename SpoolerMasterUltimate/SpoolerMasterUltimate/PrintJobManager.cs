@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing.Printing;
 using System.Printing;
+using System.Printing.IndexedProperties;
 using System.Windows;
 
 namespace SpoolerMasterUltimate {
@@ -23,12 +24,22 @@ namespace SpoolerMasterUltimate {
 		}
 
 		public void UpdatePrintQueue() {
+			MessageBox.Show("Method: UpdatePrintQueue");
 			var mainPrintServer = new PrintServer(PrinterWindow.PrinterSelection);
+			MessageBox.Show("Main Print Server connection established");
+			//_mainPrintQueue = mainPrintServer.GetPrintQueue(PrinterWindow.PrinterSelection); //This sadly doesn't work at all. Printer name is invalid.
+			/*_mainPrintQueue =
+				mainPrintServer.GetPrintQueue(PrinterSettings.InstalledPrinters[PrinterWindow.PrinterSelectionIndex]);*/ // 
+
+				//The following works for local printer connections just fine.
 			var pqc = mainPrintServer.GetPrintQueues();
+			MessageBox.Show("Print Queues recieved");
 			var printQueues = "Print Queues Found:";
 			foreach (var pq in pqc) {
 				printQueues += "\n" + pq.Name;
+				MessageBox.Show(pq.Name + " Found");
 				if (pq.FullName == PrinterWindow.PrinterSelection) {
+					MessageBox.Show(pq.Name + " is now Main Print Queue");
 					_mainPrintQueue = pq;
 					PrinterConnection = true;
 				}
@@ -54,6 +65,7 @@ namespace SpoolerMasterUltimate {
 		}
 
 		public List<PrintJobData> GetPrintData() {
+			MessageBox.Show("Method: GetPrintData()");
 			var printJobs = new List<PrintJobData>();
 			foreach (var job in _mainPrintQueue.GetPrintJobInfoCollection()) {
 				var jobDataBuilder = new PrintJobData {
@@ -65,6 +77,7 @@ namespace SpoolerMasterUltimate {
 				};
 				printJobs.Add(jobDataBuilder);
 			}
+			MessageBox.Show("Leaving GetPrintData()");
 			return printJobs;
 		}
 

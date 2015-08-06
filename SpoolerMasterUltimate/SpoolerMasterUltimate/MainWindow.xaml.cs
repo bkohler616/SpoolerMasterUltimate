@@ -30,7 +30,7 @@ namespace SpoolerMasterUltimate {
 			_updateTime.Elapsed += UpdateTime_Elapsed;
 			_updateTime.Start();
 
-			_path = (new FileInfo(Assembly.GetEntryAssembly().Location)).Directory + "//TimeOverlaySettings.xml";
+			_path = (new FileInfo(Assembly.GetEntryAssembly().Location)).Directory + "//SMU_Settings.xml";
 
 			//If settings save exists, deserialize it to SettingsWindow
 			if (File.Exists(_path)) {

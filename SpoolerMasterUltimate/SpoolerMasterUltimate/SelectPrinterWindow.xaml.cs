@@ -6,7 +6,7 @@ namespace SpoolerMasterUltimate {
 	/// <summary>
 	///     Interaction logic for SelectPrinterWindow.xaml
 	/// </summary>
-	public partial class SelectPrinterWindow {
+	public partial class SelectPrinterWindow : Window {
 		public SelectPrinterWindow() {
 			InitializeComponent();
 		}
