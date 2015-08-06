@@ -19,12 +19,21 @@ namespace SpoolerMasterUltimate {
 		public bool PrinterConnection { get; private set; }
 		public SelectPrinterWindow PrinterWindow { get; }
 
+		/// <summary>
+		///     Get the currently installed printers, and populate the PrinterWindow with the printers, and display the window.
+		/// </summary>
 		public void GetNewPrinter() {
 			var printers = PrinterSettings.InstalledPrinters;
 			PrinterWindow.GetNewPrinters(printers);
 		}
 
+		/// <summary>
+		///     Update MainPrintQueue by first determining if the printer is network located or local,
+		///     building the server and printer location according to that information, then grabbing
+		///     the printer desired by searching through the server for the printer name.
+		/// </summary>
 		public void UpdatePrintQueue() {
+			PrinterConnection = false;
 			//Determine if the printer is network located or local.
 			var counter = 0;
 			bool isNetwork = false, networkInfo = true;
@@ -56,8 +65,9 @@ namespace SpoolerMasterUltimate {
 					? new PrintServer(serverName)
 					: new PrintServer(serverName + printerLocation);
 			}
-
 			MessageBox.Show("Main Print Server connection established");
+
+			//Iterate through print queues until desired print queue is found.
 			var pqc = MainPrintServer.GetPrintQueues();
 			foreach (var pq in pqc) {
 				if (pq.FullName == PrinterWindow.PrinterSelection) {
@@ -67,7 +77,11 @@ namespace SpoolerMasterUltimate {
 			}
 		}
 
-		public void DeletePrintQueues(IList printData) {
+		/// <summary>
+		///     Delete the print jobs according to job id.
+		/// </summary>
+		/// <param name="printData"></param>
+		public void DeletePrintJobs(IList printData) {
 			foreach (DataRowView row in printData) {
 				var jobId = int.Parse(row["JobId"].ToString());
 
@@ -80,7 +94,11 @@ namespace SpoolerMasterUltimate {
 			}
 		}
 
-		public void PausePrinteQueues(IList printData) {
+		/// <summary>
+		///     Pause or unpause print jobs according to job id.
+		/// </summary>
+		/// <param name="printData"></param>
+		public void PausePrintJobs(IList printData) {
 			foreach (DataRowView row in printData) {
 				var jobId = int.Parse(row["JobId"].ToString());
 				if (_mainPrintQueue.GetJob(jobId).IsPaused) {
@@ -103,6 +121,10 @@ namespace SpoolerMasterUltimate {
 			}
 		}
 
+		/// <summary>
+		///     Get print jobs from MainPrintQueue, and build the job's information in a format to be placed in a DataGrid.
+		/// </summary>
+		/// <returns>A List(PrintJobData) of print jobs currently being sent to the printer.</returns>
 		public List<PrintJobData> GetPrintData() {
 			var printJobs = new List<PrintJobData>();
 			foreach (var job in _mainPrintQueue.GetPrintJobInfoCollection()) {
@@ -122,6 +144,11 @@ namespace SpoolerMasterUltimate {
 			return printJobs;
 		}
 
+		/// <summary>
+		///     Iterate through the MainPrintQueue's status's, selecting the one that is most important,
+		///     and returning that information back to the main window.
+		/// </summary>
+		/// <returns></returns>
 		public string CurrentPrinterStatus() {
 			if (PrinterConnection == false)
 				return "No connection established.";
@@ -143,6 +170,10 @@ namespace SpoolerMasterUltimate {
 			       (_mainPrintQueue.QueueStatus.ToString() == "None" ? "No Print Issues" : _mainPrintQueue.QueueStatus.ToString());
 		}
 
+		/// <summary>
+		///     A (foolish) attempt to properly dispose of the print queue and server so admin rights can be re-obtained on net
+		///     execution.
+		/// </summary>
 		public void Dispose() {
 			try {
 				_mainPrintQueue.Dispose();

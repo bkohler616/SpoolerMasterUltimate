@@ -14,6 +14,10 @@ namespace SpoolerMasterUltimate {
 		public bool PrinterGet { get; set; }
 		public string PrinterSelection { get; private set; }
 
+		/// <summary>
+		///     Clear the combobox of items, then populate it with currently printer gathered by external source.
+		/// </summary>
+		/// <param name="printers"></param>
 		public void GetNewPrinters(PrinterSettings.StringCollection printers) {
 			cbPrinterSelection.Items.Clear();
 			foreach (string printer in printers) cbPrinterSelection.Items.Add(printer);
@@ -21,11 +25,22 @@ namespace SpoolerMasterUltimate {
 			else cbPrinterSelection.SelectedIndex = 0;
 		}
 
+		/// <summary>
+		///     If the window is closed, hide instead to save resources.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void SelectPrinterWindow_OnClosing(object sender, CancelEventArgs e) {
 			e.Cancel = true;
 			Hide();
 		}
 
+		/// <summary>
+		///     Hide the window, then set the printer selection that was obtained,
+		///     and inform objects watching printer selection that is has gathered a new printer.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void AcceptButton_OnClick(object sender, RoutedEventArgs e) {
 			Hide();
 			PrinterSelection = cbPrinterSelection.Text;

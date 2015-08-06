@@ -45,6 +45,8 @@ namespace SpoolerMasterUltimate {
 			_settingsWindowAccess.Hide();
 
 			_printManager = new PrintJobManager();
+
+			//TODO: Add save system for Print job management. (do after management systems are working)
 		}
 
 		/// <summary>
@@ -65,6 +67,9 @@ namespace SpoolerMasterUltimate {
 			_updateTime.Start();
 		}
 
+		/// <summary>
+		///     Update the settings through the delegate.
+		/// </summary>
 		private void SettingsUpdate() {
 			LblDate.Foreground =
 				(SolidColorBrush) new BrushConverter().ConvertFrom("#" + _settingsWindowAccess.Settings.DateTextColor);
@@ -80,6 +85,10 @@ namespace SpoolerMasterUltimate {
 			WinMainWindowHandler.IsHitTestVisible = _settingsWindowAccess.Settings.ClickThrough;
 		}
 
+		/// <summary>
+		///     Update printer information.
+		///     (lblPrinterStatus, dgPrintMonitor, and _printManager)
+		/// </summary>
 		private void PrinterUpdate() {
 			if (_printManager.PrinterWindow.PrinterGet) {
 				_printManager.PrinterWindow.PrinterGet = false;
@@ -160,25 +169,48 @@ namespace SpoolerMasterUltimate {
 			_settingsWindowAccess.Settings.CloseApplication = true;
 		}
 
+		/// <summary>
+		///     Show set printer dialog.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void SetPrinter_OnClick(object sender, RoutedEventArgs e) {
 			_printManager.GetNewPrinter();
 			_printManager.PrinterWindow.Show();
 		}
 
+		/// <summary>
+		///     Attempt to delete print job(s) selected in dgPrintMonitor
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void PrintJobDelete_OnClick(object sender, RoutedEventArgs e) {
-			_printManager.DeletePrintQueues(dgPrintMonitor.SelectedItems);
+			_printManager.DeletePrintJobs(dgPrintMonitor.SelectedItems);
 		}
 
+		/// <summary>
+		///     Attempt to pause print job(s) selected in dgPrintMonitor
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void PrintJobPause_OnClick(object sender, RoutedEventArgs e) {
-			_printManager.PausePrinteQueues(dgPrintMonitor.SelectedItems);
+			_printManager.PausePrintJobs(dgPrintMonitor.SelectedItems);
 		}
 
+		/// <summary>
+		///     Set the dgPrintMonitor source and re-select the print job that was currently selected.
+		/// </summary>
 		private void SetPrintStatus() {
 			var newPrintData = _printManager.GetPrintData();
 			dgPrintMonitor.ItemsSource = newPrintData;
 			dgPrintMonitor.SelectedIndex = _selectedJob;
 		}
 
+		/// <summary>
+		///     On selection change in dgPrintMonitor, get the newly selected job.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		private void dgPrintMonitor_SelectionChanged(object sender, SelectionChangedEventArgs e) {
 			_selectedJob = dgPrintMonitor.SelectedIndex;
 		}
