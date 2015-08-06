@@ -24,7 +24,38 @@ namespace SpoolerMasterUltimate {
 
 		public void UpdatePrintQueue() {
 			MessageBox.Show("Method: UpdatePrintQueue");
-			var mainPrintServer = new PrintServer(PrinterWindow.PrinterSelection);
+
+				//Determine if the printer is network located or local.
+			int counter = 0;
+			bool isNetwork = false, networkInfo = true;
+			string serverName = "", printerLocation = "";
+			foreach (var character in PrinterWindow.PrinterSelection) {
+				if (networkInfo) {
+					if (character.Equals('\\')) {
+						counter++;
+					} else if (counter < 2)
+						networkInfo = false;
+					if (counter == 2)
+						isNetwork = true;
+					if (counter > 2) {
+						printerLocation += character;
+						networkInfo = false;
+					}
+					else if(networkInfo == false) {
+						printerLocation += character;
+					}
+					else {
+						serverName += character;
+					}
+
+				}
+				else {
+					printerLocation += character;
+				}
+			}
+			MessageBox.Show("Connection attempt:\nServer name: " + serverName + "\nPrtiner Location: " + printerLocation);
+			PrintServer mainPrintServer;
+			mainPrintServer = isNetwork ? new PrintServer(serverName) : new PrintServer(serverName + printerLocation);
 			MessageBox.Show("Main Print Server connection established");
 			//_mainPrintQueue = mainPrintServer.GetPrintQueue(PrinterWindow.PrinterSelection); //This sadly doesn't work at all. Printer name is invalid.
 			/*_mainPrintQueue =
@@ -68,7 +99,6 @@ namespace SpoolerMasterUltimate {
 		}
 
 		public List<PrintJobData> GetPrintData() {
-			MessageBox.Show("Method: GetPrintData()");
 			var printJobs = new List<PrintJobData>();
 			foreach (var job in _mainPrintQueue.GetPrintJobInfoCollection()) {
 				var jobDataBuilder = new PrintJobData {
@@ -80,7 +110,6 @@ namespace SpoolerMasterUltimate {
 				};
 				printJobs.Add(jobDataBuilder);
 			}
-			MessageBox.Show("Leaving GetPrintData()");
 			return printJobs;
 		}
 
