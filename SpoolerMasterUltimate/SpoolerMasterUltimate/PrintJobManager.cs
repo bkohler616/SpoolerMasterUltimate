@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing.Printing;
@@ -14,6 +15,7 @@ namespace SpoolerMasterUltimate {
 			GetNewPrinter();
 		}
 
+		private PrintServer MainPrintServer { get; set; }
 		public bool PrinterConnection { get; set; }
 		public SelectPrinterWindow PrinterWindow { get; }
 
@@ -25,15 +27,14 @@ namespace SpoolerMasterUltimate {
 		public void UpdatePrintQueue() {
 			MessageBox.Show("Method: UpdatePrintQueue");
 
-				//Determine if the printer is network located or local.
-			int counter = 0;
+			//Determine if the printer is network located or local.
+			var counter = 0;
 			bool isNetwork = false, networkInfo = true;
 			string serverName = "", printerLocation = "";
 			foreach (var character in PrinterWindow.PrinterSelection) {
 				if (networkInfo) {
-					if (character.Equals('\\')) {
-						counter++;
-					} else if (counter < 2)
+					if (character.Equals('\\')) counter++;
+					else if (counter < 2)
 						networkInfo = false;
 					if (counter == 2)
 						isNetwork = true;
@@ -41,21 +42,24 @@ namespace SpoolerMasterUltimate {
 						printerLocation += character;
 						networkInfo = false;
 					}
-					else if(networkInfo == false) {
-						printerLocation += character;
-					}
-					else {
-						serverName += character;
-					}
-
+					else if (networkInfo == false) printerLocation += character;
+					else serverName += character;
 				}
-				else {
-					printerLocation += character;
-				}
+				else printerLocation += character;
 			}
 			MessageBox.Show("Connection attempt:\nServer name: " + serverName + "\nPrtiner Location: " + printerLocation);
-			PrintServer mainPrintServer;
-			mainPrintServer = isNetwork ? new PrintServer(serverName) : new PrintServer(serverName + printerLocation);
+			try {
+				MainPrintServer = isNetwork
+					? new PrintServer(serverName, PrintSystemDesiredAccess.AdministratePrinter)
+					: new PrintServer(serverName + printerLocation, PrintSystemDesiredAccess.AdministratePrinter);
+			}
+			catch (PrintServerException ex) {
+				MessageBox.Show("Error. " + ex.Message + ".. Attempting to connect in user mode.");
+				MainPrintServer = isNetwork
+					? new PrintServer(serverName)
+					: new PrintServer(serverName + printerLocation);
+			}
+
 			MessageBox.Show("Main Print Server connection established");
 			//_mainPrintQueue = mainPrintServer.GetPrintQueue(PrinterWindow.PrinterSelection); //This sadly doesn't work at all. Printer name is invalid.
 			/*_mainPrintQueue =
@@ -66,7 +70,7 @@ namespace SpoolerMasterUltimate {
 					 Network Error: mainPrintServer null reference exception.
 					 Dig deeper: main Print server object initialization failure. Cannot find spcified file
 				*/
-			var pqc = mainPrintServer.GetPrintQueues();
+			var pqc = MainPrintServer.GetPrintQueues();
 			MessageBox.Show("Print Queues recieved");
 			var printQueues = "Print Queues Found:";
 			foreach (var pq in pqc) {
@@ -85,16 +89,35 @@ namespace SpoolerMasterUltimate {
 			foreach (DataRowView row in printData) {
 				var jobId = int.Parse(row["JobId"].ToString());
 
-				_mainPrintQueue.GetJob(jobId).Cancel();
+				try {
+					_mainPrintQueue.GetJob(jobId).Cancel();
+				}
+				catch (Exception ex) {
+					MessageBox.Show("Error on delete attempt. " + ex.Message);
+				}
 			}
 		}
 
 		public void PausePrinteQueues(IList printData) {
 			foreach (DataRowView row in printData) {
 				var jobId = int.Parse(row["JobId"].ToString());
-				if (_mainPrintQueue.GetJob(jobId).IsPaused)
-					_mainPrintQueue.GetJob(jobId).Resume();
-				else _mainPrintQueue.GetJob(jobId).Pause();
+				if (_mainPrintQueue.GetJob(jobId).IsPaused) {
+					try {
+						_mainPrintQueue.GetJob(jobId).Resume();
+					}
+					catch (Exception ex) {
+						MessageBox.Show("Error on unpause attempt. " + ex.Message);
+					}
+				}
+
+				else {
+					try {
+						_mainPrintQueue.GetJob(jobId).Pause();
+					}
+					catch (Exception ex) {
+						MessageBox.Show("Error on pause attempt. " + ex.Message);
+					}
+				}
 			}
 		}
 
@@ -106,8 +129,12 @@ namespace SpoolerMasterUltimate {
 					JobId = job.JobIdentifier,
 					Size = job.JobSize.ToString(),
 					Status = job.JobStatus.ToString(),
-					Pages = job.NumberOfPages.ToString()
+					Pages = job.NumberOfPages.ToString(),
+					User = job.Submitter
 				};
+				if (job.NumberOfPages > 10)
+					job.Pause();
+
 				printJobs.Add(jobDataBuilder);
 			}
 			return printJobs;
@@ -126,10 +153,27 @@ namespace SpoolerMasterUltimate {
 				return "Unknown paper problem";
 			if (_mainPrintQueue.IsOutOfPaper)
 				return "Printer out of paper";
+			if (_mainPrintQueue.IsTonerLow)
+				return "Printer toner low";
 			if (_mainPrintQueue.NeedUserIntervention)
 				return "Printer needs love.";
 			return _mainPrintQueue.NumberOfJobs + " jobs, " +
 			       (_mainPrintQueue.QueueStatus.ToString() == "None" ? "No Print Issues" : _mainPrintQueue.QueueStatus.ToString());
+		}
+
+		public void Dispose() {
+			try {
+				_mainPrintQueue.Dispose();
+			}
+			catch (NullReferenceException) {
+				MessageBox.Show("Unable to dispose of print queue properly.");
+			}
+			try {
+				MainPrintServer.Dispose();
+			}
+			catch (NullReferenceException) {
+				MessageBox.Show("Unable to dispose of server handle properly.");
+			}
 		}
 	}
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
@@ -19,6 +20,9 @@ namespace SpoolerMasterUltimate {
 		private readonly SettingsWindow _settingsWindowAccess;
 		private readonly Timer _updateTime;
 		private DateTime _currentDateTime;
+		private int selectedJob;
+
+		private List<PrintJobData> oldPrintData; 
 
 		public MainWindow() {
 			InitializeComponent();
@@ -29,7 +33,7 @@ namespace SpoolerMasterUltimate {
 			_aboutWindow = new About();
 			_updateTime.Elapsed += UpdateTime_Elapsed;
 			_updateTime.Start();
-
+			selectedJob = 0;
 			_path = (new FileInfo(Assembly.GetEntryAssembly().Location)).Directory + "//SMU_Settings.xml";
 
 			//If settings save exists, deserialize it to SettingsWindow
@@ -86,6 +90,7 @@ namespace SpoolerMasterUltimate {
 			else if (_printManager.PrinterConnection) SetPrintStatus();
 
 			lblPrinterStatus.Content = _printManager.CurrentPrinterStatus();
+			dgPrintMonitor.SelectedIndex = selectedJob;
 		}
 
 		/// <summary>
@@ -105,6 +110,7 @@ namespace SpoolerMasterUltimate {
 		/// <param name="e"></param>
 		private void CloseOverlay_Click(object sender, RoutedEventArgs e) {
 			_updateTime.Stop();
+			_printManager.Dispose();
 			Application.Current.Shutdown();
 		}
 
@@ -170,8 +176,16 @@ namespace SpoolerMasterUltimate {
 		}
 
 		private void SetPrintStatus() {
-			var printData = _printManager.GetPrintData();
-			dgPrintMonitor.ItemsSource = printData;
+			var newPrintData = _printManager.GetPrintData();
+			if (newPrintData != oldPrintData) {
+					 dgPrintMonitor.ItemsSource = newPrintData;
+				}
+			oldPrintData = newPrintData;
+
 		}
-	}
+
+		  private void dgPrintMonitor_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e) {
+			  selectedJob = dgPrintMonitor.SelectedIndex;
+		  }
+	 }
 }
