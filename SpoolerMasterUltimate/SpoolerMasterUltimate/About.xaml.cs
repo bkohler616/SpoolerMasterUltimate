@@ -1,14 +1,13 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
-using System.Windows;
 using System.Windows.Navigation;
 
 namespace SpoolerMasterUltimate {
 	/// <summary>
 	///     Interaction logic for About.xaml
 	/// </summary>
-	public partial class About : Window {
+	public partial class About {
 		public About() {
 			InitializeComponent();
 			Hide();

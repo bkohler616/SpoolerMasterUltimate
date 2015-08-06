@@ -5,6 +5,6 @@
 		public string Status { get; set; }
 		public string Pages { get; set; }
 		public string Size { get; set; }
-		  public string User { get; set; }
+		public string User { get; set; }
 	}
 }

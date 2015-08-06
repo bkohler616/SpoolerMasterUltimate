@@ -16,7 +16,7 @@ namespace SpoolerMasterUltimate {
 		}
 
 		private PrintServer MainPrintServer { get; set; }
-		public bool PrinterConnection { get; set; }
+		public bool PrinterConnection { get; private set; }
 		public SelectPrinterWindow PrinterWindow { get; }
 
 		public void GetNewPrinter() {
@@ -25,8 +25,6 @@ namespace SpoolerMasterUltimate {
 		}
 
 		public void UpdatePrintQueue() {
-			MessageBox.Show("Method: UpdatePrintQueue");
-
 			//Determine if the printer is network located or local.
 			var counter = 0;
 			bool isNetwork = false, networkInfo = true;
@@ -47,7 +45,6 @@ namespace SpoolerMasterUltimate {
 				}
 				else printerLocation += character;
 			}
-			MessageBox.Show("Connection attempt:\nServer name: " + serverName + "\nPrtiner Location: " + printerLocation);
 			try {
 				MainPrintServer = isNetwork
 					? new PrintServer(serverName, PrintSystemDesiredAccess.AdministratePrinter)
@@ -61,28 +58,13 @@ namespace SpoolerMasterUltimate {
 			}
 
 			MessageBox.Show("Main Print Server connection established");
-			//_mainPrintQueue = mainPrintServer.GetPrintQueue(PrinterWindow.PrinterSelection); //This sadly doesn't work at all. Printer name is invalid.
-			/*_mainPrintQueue =
-				mainPrintServer.GetPrintQueue(PrinterSettings.InstalledPrinters[PrinterWindow.PrinterSelectionIndex]);*/ // 
-
-			//The following works for local printer connections just fine.
-			/*
-					 Network Error: mainPrintServer null reference exception.
-					 Dig deeper: main Print server object initialization failure. Cannot find spcified file
-				*/
 			var pqc = MainPrintServer.GetPrintQueues();
-			MessageBox.Show("Print Queues recieved");
-			var printQueues = "Print Queues Found:";
 			foreach (var pq in pqc) {
-				printQueues += "\n" + pq.Name;
-				MessageBox.Show(pq.Name + " Found");
 				if (pq.FullName == PrinterWindow.PrinterSelection) {
-					MessageBox.Show(pq.Name + " is now Main Print Queue");
 					_mainPrintQueue = pq;
 					PrinterConnection = true;
 				}
 			}
-			MessageBox.Show(printQueues);
 		}
 
 		public void DeletePrintQueues(IList printData) {

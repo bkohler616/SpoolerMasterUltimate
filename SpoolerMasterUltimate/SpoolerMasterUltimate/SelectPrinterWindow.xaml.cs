@@ -6,13 +6,13 @@ namespace SpoolerMasterUltimate {
 	/// <summary>
 	///     Interaction logic for SelectPrinterWindow.xaml
 	/// </summary>
-	public partial class SelectPrinterWindow : Window {
+	public partial class SelectPrinterWindow {
 		public SelectPrinterWindow() {
 			InitializeComponent();
 		}
 
 		public bool PrinterGet { get; set; }
-		public string PrinterSelection { get; set; }
+		public string PrinterSelection { get; private set; }
 
 		public void GetNewPrinters(PrinterSettings.StringCollection printers) {
 			cbPrinterSelection.Items.Clear();
@@ -29,7 +29,6 @@ namespace SpoolerMasterUltimate {
 		private void AcceptButton_OnClick(object sender, RoutedEventArgs e) {
 			Hide();
 			PrinterSelection = cbPrinterSelection.Text;
-			MessageBox.Show(PrinterSelection);
 			PrinterGet = true;
 		}
 	}
