@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
@@ -20,19 +21,23 @@ namespace SpoolerMasterUltimate {
 		private readonly SettingsWindow _settingsWindowAccess;
 		private readonly Timer _updateTime;
 		private DateTime _currentDateTime;
+		private List<PrintJobData> _oldPrintData;
+		private int _printerUpdateCount;
 		private int _selectedJob;
 
 		public MainWindow() {
 			InitializeComponent();
 			_updateTime = new Timer {
-				Interval = 1000
+				Interval = 500
 			};
+			_printerUpdateCount = 0;
 			_currentDateTime = new DateTime();
 			_aboutWindow = new About();
 			_updateTime.Elapsed += UpdateTime_Elapsed;
 			_updateTime.Start();
 			_selectedJob = 0;
 			_path = (new FileInfo(Assembly.GetEntryAssembly().Location)).Directory + "//SMU_Settings.xml";
+			_oldPrintData = new List<PrintJobData> {new PrintJobData()};
 
 			//If settings save exists, deserialize it to SettingsWindow
 			if (File.Exists(_path)) {
@@ -90,14 +95,20 @@ namespace SpoolerMasterUltimate {
 		///     (lblPrinterStatus, dgPrintMonitor, and _printManager)
 		/// </summary>
 		private void PrinterUpdate() {
-			if (_printManager.PrinterWindow.PrinterGet) {
-				_printManager.PrinterWindow.PrinterGet = false;
-				_printManager.UpdatePrintQueue();
-			}
-			else if (_printManager.PrinterConnection) SetPrintStatus();
+			_printerUpdateCount++;
+			if (_printerUpdateCount == 4) {
+				_printerUpdateCount = 0;
+				if (_printManager.PrinterWindow.PrinterGet) {
+					_printManager.PrinterWindow.PrinterGet = false;
+					_printManager.UpdatePrintQueue();
+					dgPrintMonitor.Visibility = Visibility.Visible;
+				}
+				else if (_printManager.PrinterConnection) SetPrintStatus();
+					 dgPrintMonitor.SelectedIndex = _selectedJob;
+				}
 
 			lblPrinterStatus.Content = _printManager.CurrentPrinterStatus();
-			dgPrintMonitor.SelectedIndex = _selectedJob;
+			
 		}
 
 		/// <summary>
@@ -202,7 +213,22 @@ namespace SpoolerMasterUltimate {
 		/// </summary>
 		private void SetPrintStatus() {
 			var newPrintData = _printManager.GetPrintData();
-			dgPrintMonitor.ItemsSource = newPrintData;
+			var printNotSame = false;
+			foreach (var oldJob in _oldPrintData) {
+				foreach (var newJob in newPrintData) {
+					if (!oldJob.Equals(newJob)) printNotSame = true;
+					if (printNotSame)
+						break;
+				}
+
+				if (printNotSame)
+					break;
+			}
+			if (printNotSame) {
+				_oldPrintData = newPrintData;
+				dgPrintMonitor.ItemsSource = newPrintData;
+			}
+			//TODO: Find a better way to set the selected index, because this does not work the way it is intended.
 			dgPrintMonitor.SelectedIndex = _selectedJob;
 		}
 

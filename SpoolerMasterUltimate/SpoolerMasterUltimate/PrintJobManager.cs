@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Drawing.Printing;
 using System.Printing;
 using System.Windows;
@@ -54,25 +53,23 @@ namespace SpoolerMasterUltimate {
 				}
 				else printerLocation += character;
 			}
-			try {
-				MainPrintServer = isNetwork
-					? new PrintServer(serverName, PrintSystemDesiredAccess.AdministratePrinter)
-					: new PrintServer(serverName + printerLocation, PrintSystemDesiredAccess.AdministratePrinter);
-			}
-			catch (PrintServerException ex) {
-				MessageBox.Show("Error. " + ex.Message + ".. Attempting to connect in user mode.");
 				MainPrintServer = isNetwork
 					? new PrintServer(serverName)
 					: new PrintServer(serverName + printerLocation);
-			}
-			MessageBox.Show("Main Print Server connection established");
 
 			//Iterate through print queues until desired print queue is found.
-			var pqc = MainPrintServer.GetPrintQueues();
-			foreach (var pq in pqc) {
-				if (pq.FullName == PrinterWindow.PrinterSelection) {
-					_mainPrintQueue = pq;
-					PrinterConnection = true;
+			if (isNetwork) {
+				_mainPrintQueue = new PrintQueue(MainPrintServer, PrinterWindow.PrinterSelection,
+					PrintSystemDesiredAccess.AdministratePrinter);
+				PrinterConnection = true;
+			}
+			else {
+				var pqc = MainPrintServer.GetPrintQueues();
+				foreach (var pq in pqc) {
+					if (pq.FullName == PrinterWindow.PrinterSelection) {
+						_mainPrintQueue = pq;
+						PrinterConnection = true;
+					}
 				}
 			}
 		}
@@ -82,16 +79,22 @@ namespace SpoolerMasterUltimate {
 		/// </summary>
 		/// <param name="printData"></param>
 		public void DeletePrintJobs(IList printData) {
-			foreach (DataRowView row in printData) {
-				var jobId = int.Parse(row["JobId"].ToString());
+			MessageBox.Show("Entered delete job.");
+			for (var i = 0; i < printData.Count; i++) {
+				var printJob = (PrintJobData) printData[i];
+				MessageBox.Show("Print data successfully stored into print job");
+				MessageBox.Show("Parse success: " + printJob.JobId);
 
 				try {
-					_mainPrintQueue.GetJob(jobId).Cancel();
+					_mainPrintQueue.GetJob(printJob.JobId).Cancel();
+					MessageBox.Show("Job reached cancel");
 				}
 				catch (Exception ex) {
 					MessageBox.Show("Error on delete attempt. " + ex.Message);
 				}
 			}
+
+			MessageBox.Show("Job being canceled.");
 		}
 
 		/// <summary>
@@ -99,11 +102,13 @@ namespace SpoolerMasterUltimate {
 		/// </summary>
 		/// <param name="printData"></param>
 		public void PausePrintJobs(IList printData) {
-			foreach (DataRowView row in printData) {
-				var jobId = int.Parse(row["JobId"].ToString());
-				if (_mainPrintQueue.GetJob(jobId).IsPaused) {
+			MessageBox.Show("Entered pause job.");
+			foreach (PrintJobData printJob in printData) {
+				MessageBox.Show("Print data successfully stored into print job");
+				MessageBox.Show("Parse success: " + printJob.JobId);
+				if (_mainPrintQueue.GetJob(printJob.JobId).IsPaused) {
 					try {
-						_mainPrintQueue.GetJob(jobId).Resume();
+						_mainPrintQueue.GetJob(printJob.JobId).Resume();
 					}
 					catch (Exception ex) {
 						MessageBox.Show("Error on unpause attempt. " + ex.Message);
@@ -112,13 +117,15 @@ namespace SpoolerMasterUltimate {
 
 				else {
 					try {
-						_mainPrintQueue.GetJob(jobId).Pause();
+						_mainPrintQueue.GetJob(printJob.JobId).Pause();
 					}
 					catch (Exception ex) {
 						MessageBox.Show("Error on pause attempt. " + ex.Message);
 					}
 				}
 			}
+
+			MessageBox.Show("Job being paused");
 		}
 
 		/// <summary>
@@ -126,6 +133,7 @@ namespace SpoolerMasterUltimate {
 		/// </summary>
 		/// <returns>A List(PrintJobData) of print jobs currently being sent to the printer.</returns>
 		public List<PrintJobData> GetPrintData() {
+			_mainPrintQueue.Refresh();
 			var printJobs = new List<PrintJobData>();
 			foreach (var job in _mainPrintQueue.GetPrintJobInfoCollection()) {
 				var jobDataBuilder = new PrintJobData {
@@ -138,7 +146,6 @@ namespace SpoolerMasterUltimate {
 				};
 				if (job.NumberOfPages > 10)
 					job.Pause();
-
 				printJobs.Add(jobDataBuilder);
 			}
 			return printJobs;

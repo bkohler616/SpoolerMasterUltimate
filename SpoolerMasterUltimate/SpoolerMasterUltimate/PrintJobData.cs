@@ -10,5 +10,17 @@
 		public string Pages { get; set; }
 		public string Size { get; set; }
 		public string User { get; set; }
+
+		public PrintJobData() {
+			JobId = -5;
+		}
+
+		public bool Equals(PrintJobData otherJobData) {
+			if (JobId == otherJobData.JobId)
+				return Status == otherJobData.Status;
+			return false;
+
+			//return JobId == otherJobData.JobId;
+		}
 	}
 }

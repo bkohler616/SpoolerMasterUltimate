@@ -58,7 +58,11 @@
 					CanUserResizeColumns="True"
 					CanUserResizeRows="False"
 					CanUserSortColumns="False"
-					IsReadOnly="True" SelectionChanged="dgPrintMonitor_SelectionChanged" />
+					IsReadOnly="True"
+					SelectionChanged="dgPrintMonitor_SelectionChanged"
+					SelectionMode="Extended"
+					SelectionUnit="FullRow"
+					 Visibility="Hidden"/>
 				<WrapPanel FlowDirection="LeftToRight"
 				           VerticalAlignment="Bottom"
 				           HorizontalAlignment="Right">
