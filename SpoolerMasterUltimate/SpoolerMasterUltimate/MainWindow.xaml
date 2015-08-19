@@ -46,23 +46,25 @@
 				       Content="Printer Status Loading"
 				       Foreground="White"
 				       FontSize="30" />
-				<DataGrid
-					Name="dgPrintMonitor"
+                <ListView
+					Name="lvPrintMonitor"
 					VerticalAlignment="Bottom"
 					HorizontalAlignment="Right"
 					Height="100"
-					VerticalScrollBarVisibility="Auto"
-					CanUserAddRows="False"
-					CanUserReorderColumns="False"
-					CanUserDeleteRows="False"
-					CanUserResizeColumns="True"
-					CanUserResizeRows="False"
-					CanUserSortColumns="False"
-					IsReadOnly="True"
-					SelectionChanged="dgPrintMonitor_SelectionChanged"
+					SelectionChanged="lvPrintMonitor_SelectionChanged"
 					SelectionMode="Extended"
-					SelectionUnit="FullRow"
-					 Visibility="Hidden"/>
+					Visibility="Hidden">
+						  <ListView.View>
+								<GridView>
+									 <GridViewColumn Header="Job Id" DisplayMemberBinding="{Binding JobId}"/>
+									 <GridViewColumn Header="Document Name" DisplayMemberBinding="{Binding DocumentName}"/>
+                            <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}"/>
+                            <GridViewColumn Header="Pages" DisplayMemberBinding="{Binding Pages}"/>
+                            <GridViewColumn Header="Size" DisplayMemberBinding="{Binding Size}"/>
+                            <GridViewColumn Header="User" DisplayMemberBinding="{Binding User}"/>
+                        </GridView>
+						  </ListView.View>
+					 </ListView>
 				<WrapPanel FlowDirection="LeftToRight"
 				           VerticalAlignment="Bottom"
 				           HorizontalAlignment="Right">

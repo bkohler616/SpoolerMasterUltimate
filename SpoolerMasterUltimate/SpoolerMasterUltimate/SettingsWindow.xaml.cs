@@ -11,12 +11,13 @@ namespace SpoolerMasterUltimate {
 	///     Interaction logic for SettingsWindow.xaml
 	/// </summary>
 	public partial class SettingsWindow {
+		public NotifyIcon NIcon;
 		public SettingsWindow() {
 			InitializeComponent();
 			Settings = new SettingsInfo();
-			var nIcon = new NotifyIcon {Icon = SystemIcons.Application};
-			nIcon.MouseClick += NIconOnTrayLeftMouseDown;
-			nIcon.Visible = true;
+		   NIcon = new NotifyIcon {Icon = SystemIcons.Application};
+			NIcon.MouseClick += NIconOnTrayLeftMouseDown;
+			NIcon.Visible = true;
 			SetSettingsWindowContent();
 		}
 

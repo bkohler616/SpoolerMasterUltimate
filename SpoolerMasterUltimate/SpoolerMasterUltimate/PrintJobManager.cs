@@ -7,7 +7,7 @@ using System.Windows;
 
 namespace SpoolerMasterUltimate {
 	internal class PrintJobManager {
-		private PrintQueue _mainPrintQueue;
+		public PrintQueue MainPrintQueue;
 
 		public PrintJobManager() {
 			PrinterWindow = new SelectPrinterWindow();
@@ -59,7 +59,7 @@ namespace SpoolerMasterUltimate {
 
 			//Iterate through print queues until desired print queue is found.
 			if (isNetwork) {
-				_mainPrintQueue = new PrintQueue(MainPrintServer, PrinterWindow.PrinterSelection,
+				MainPrintQueue = new PrintQueue(MainPrintServer, PrinterWindow.PrinterSelection,
 					PrintSystemDesiredAccess.AdministratePrinter);
 				PrinterConnection = true;
 			}
@@ -67,7 +67,7 @@ namespace SpoolerMasterUltimate {
 				var pqc = MainPrintServer.GetPrintQueues();
 				foreach (var pq in pqc) {
 					if (pq.FullName == PrinterWindow.PrinterSelection) {
-						_mainPrintQueue = pq;
+						MainPrintQueue = pq;
 						PrinterConnection = true;
 					}
 				}
@@ -79,22 +79,16 @@ namespace SpoolerMasterUltimate {
 		/// </summary>
 		/// <param name="printData"></param>
 		public void DeletePrintJobs(IList printData) {
-			MessageBox.Show("Entered delete job.");
 			for (var i = 0; i < printData.Count; i++) {
 				var printJob = (PrintJobData) printData[i];
-				MessageBox.Show("Print data successfully stored into print job");
-				MessageBox.Show("Parse success: " + printJob.JobId);
 
 				try {
-					_mainPrintQueue.GetJob(printJob.JobId).Cancel();
-					MessageBox.Show("Job reached cancel");
+					MainPrintQueue.GetJob(printJob.JobId).Cancel();
 				}
 				catch (Exception ex) {
 					MessageBox.Show("Error on delete attempt. " + ex.Message);
 				}
 			}
-
-			MessageBox.Show("Job being canceled.");
 		}
 
 		/// <summary>
@@ -102,22 +96,19 @@ namespace SpoolerMasterUltimate {
 		/// </summary>
 		/// <param name="printData"></param>
 		public void PausePrintJobs(IList printData) {
-			MessageBox.Show("Entered pause job.");
 			foreach (PrintJobData printJob in printData) {
-				MessageBox.Show("Print data successfully stored into print job");
-				MessageBox.Show("Parse success: " + printJob.JobId);
-				if (_mainPrintQueue.GetJob(printJob.JobId).IsPaused) {
+				if (MainPrintQueue.GetJob(printJob.JobId).IsPaused) {
 					try {
-						_mainPrintQueue.GetJob(printJob.JobId).Resume();
+						MainPrintQueue.GetJob(printJob.JobId).Resume();
 					}
 					catch (Exception ex) {
-						MessageBox.Show("Error on unpause attempt. " + ex.Message);
+						MessageBox.Show("Error on pause attempt. " + ex.Message);
 					}
 				}
 
 				else {
 					try {
-						_mainPrintQueue.GetJob(printJob.JobId).Pause();
+						MainPrintQueue.GetJob(printJob.JobId).Pause();
 					}
 					catch (Exception ex) {
 						MessageBox.Show("Error on pause attempt. " + ex.Message);
@@ -133,9 +124,9 @@ namespace SpoolerMasterUltimate {
 		/// </summary>
 		/// <returns>A List(PrintJobData) of print jobs currently being sent to the printer.</returns>
 		public List<PrintJobData> GetPrintData() {
-			_mainPrintQueue.Refresh();
+			MainPrintQueue.Refresh();
 			var printJobs = new List<PrintJobData>();
-			foreach (var job in _mainPrintQueue.GetPrintJobInfoCollection()) {
+			foreach (var job in MainPrintQueue.GetPrintJobInfoCollection()) {
 				var jobDataBuilder = new PrintJobData {
 					DocumentName = job.JobName,
 					JobId = job.JobIdentifier,
@@ -159,22 +150,22 @@ namespace SpoolerMasterUltimate {
 		public string CurrentPrinterStatus() {
 			if (PrinterConnection == false)
 				return "No connection established.";
-			if (_mainPrintQueue.IsOffline)
+			if (MainPrintQueue.IsOffline)
 				return "Printer Offline";
-			if (_mainPrintQueue.IsDoorOpened)
+			if (MainPrintQueue.IsDoorOpened)
 				return "Printer Door Opened";
-			if (_mainPrintQueue.IsPaperJammed)
+			if (MainPrintQueue.IsPaperJammed)
 				return "Printer Jammed";
-			if (_mainPrintQueue.HasPaperProblem)
+			if (MainPrintQueue.HasPaperProblem)
 				return "Unknown paper problem";
-			if (_mainPrintQueue.IsOutOfPaper)
+			if (MainPrintQueue.IsOutOfPaper)
 				return "Printer out of paper";
-			if (_mainPrintQueue.IsTonerLow)
+			if (MainPrintQueue.IsTonerLow)
 				return "Printer toner low";
-			if (_mainPrintQueue.NeedUserIntervention)
+			if (MainPrintQueue.NeedUserIntervention)
 				return "Printer needs love.";
-			return _mainPrintQueue.NumberOfJobs + " jobs, " +
-			       (_mainPrintQueue.QueueStatus.ToString() == "None" ? "No Print Issues" : _mainPrintQueue.QueueStatus.ToString());
+			return MainPrintQueue.NumberOfJobs + " jobs, " +
+			       (MainPrintQueue.QueueStatus.ToString() == "None" ? "No Print Issues" : MainPrintQueue.QueueStatus.ToString());
 		}
 
 		/// <summary>
@@ -183,7 +174,7 @@ namespace SpoolerMasterUltimate {
 		/// </summary>
 		public void Dispose() {
 			try {
-				_mainPrintQueue.Dispose();
+				MainPrintQueue.Dispose();
 			}
 			catch (NullReferenceException) {
 				MessageBox.Show("Unable to dispose of print queue properly.");

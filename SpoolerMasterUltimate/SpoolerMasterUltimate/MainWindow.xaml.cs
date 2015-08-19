@@ -22,7 +22,6 @@ namespace SpoolerMasterUltimate {
 		private readonly Timer _updateTime;
 		private DateTime _currentDateTime;
 		private List<PrintJobData> _oldPrintData;
-		private int _printerUpdateCount;
 		private int _selectedJob;
 
 		public MainWindow() {
@@ -30,7 +29,6 @@ namespace SpoolerMasterUltimate {
 			_updateTime = new Timer {
 				Interval = 500
 			};
-			_printerUpdateCount = 0;
 			_currentDateTime = new DateTime();
 			_aboutWindow = new About();
 			_updateTime.Elapsed += UpdateTime_Elapsed;
@@ -92,23 +90,20 @@ namespace SpoolerMasterUltimate {
 
 		/// <summary>
 		///     Update printer information.
-		///     (lblPrinterStatus, dgPrintMonitor, and _printManager)
+		///     (lblPrinterStatus, lvPrintMonitor, and _printManager)
 		/// </summary>
 		private void PrinterUpdate() {
-			_printerUpdateCount++;
-			if (_printerUpdateCount == 4) {
-				_printerUpdateCount = 0;
-				if (_printManager.PrinterWindow.PrinterGet) {
-					_printManager.PrinterWindow.PrinterGet = false;
-					_printManager.UpdatePrintQueue();
-					dgPrintMonitor.Visibility = Visibility.Visible;
-				}
-				else if (_printManager.PrinterConnection) SetPrintStatus();
-					 dgPrintMonitor.SelectedIndex = _selectedJob;
-				}
+		  if (_printManager.PrinterWindow.PrinterGet) {
+				_printManager.PrinterWindow.PrinterGet = false;
+				_printManager.UpdatePrintQueue();
+				lvPrintMonitor.Visibility = Visibility.Visible;
+		  }
+		  else if (_printManager.PrinterConnection) SetPrintStatus();
+				lvPrintMonitor.SelectedIndex = _selectedJob;
 
 			lblPrinterStatus.Content = _printManager.CurrentPrinterStatus();
-			
+			lvPrintMonitor.SelectedIndex = _selectedJob;
+
 		}
 
 		/// <summary>
@@ -128,6 +123,8 @@ namespace SpoolerMasterUltimate {
 		/// <param name="e"></param>
 		private void CloseOverlay_Click(object sender, RoutedEventArgs e) {
 			_updateTime.Stop();
+			_settingsWindowAccess.NIcon.Visible = false;
+		   _settingsWindowAccess.NIcon.Dispose();
 			_printManager.Dispose();
 			Application.Current.Shutdown();
 		}
@@ -191,54 +188,56 @@ namespace SpoolerMasterUltimate {
 		}
 
 		/// <summary>
-		///     Attempt to delete print job(s) selected in dgPrintMonitor
+		///     Attempt to delete print job(s) selected in lvPrintMonitor
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void PrintJobDelete_OnClick(object sender, RoutedEventArgs e) {
-			_printManager.DeletePrintJobs(dgPrintMonitor.SelectedItems);
+			_printManager.DeletePrintJobs(lvPrintMonitor.SelectedItems);
 		}
 
 		/// <summary>
-		///     Attempt to pause print job(s) selected in dgPrintMonitor
+		///     Attempt to pause print job(s) selected in lvPrintMonitor
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void PrintJobPause_OnClick(object sender, RoutedEventArgs e) {
-			_printManager.PausePrintJobs(dgPrintMonitor.SelectedItems);
+			_printManager.PausePrintJobs(lvPrintMonitor.SelectedItems);
 		}
 
 		/// <summary>
-		///     Set the dgPrintMonitor source and re-select the print job that was currently selected.
+		///     Set the lvPrintMonitor source and re-select the print job that was currently selected.
 		/// </summary>
 		private void SetPrintStatus() {
 			var newPrintData = _printManager.GetPrintData();
-			var printNotSame = false;
-			foreach (var oldJob in _oldPrintData) {
-				foreach (var newJob in newPrintData) {
-					if (!oldJob.Equals(newJob)) printNotSame = true;
+			bool printNotSame = _printManager.MainPrintQueue.NumberOfJobs < 1;
+			if (!printNotSame) {
+				foreach (var oldJob in _oldPrintData) {
+					foreach (var newJob in newPrintData) {
+						if (!oldJob.Equals(newJob)) printNotSame = true;
+						if (printNotSame)
+							break;
+					}
+
 					if (printNotSame)
 						break;
 				}
-
-				if (printNotSame)
-					break;
 			}
 			if (printNotSame) {
 				_oldPrintData = newPrintData;
-				dgPrintMonitor.ItemsSource = newPrintData;
+				lvPrintMonitor.ItemsSource = newPrintData;
 			}
-			//TODO: Find a better way to set the selected index, because this does not work the way it is intended.
-			dgPrintMonitor.SelectedIndex = _selectedJob;
+			lvPrintMonitor.SelectedIndex = _selectedJob;
 		}
 
 		/// <summary>
-		///     On selection change in dgPrintMonitor, get the newly selected job.
+		///     On selection change in lvPrintMonitor, get the newly selected job.
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		private void dgPrintMonitor_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-			_selectedJob = dgPrintMonitor.SelectedIndex;
+		private void lvPrintMonitor_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+			if (lvPrintMonitor.SelectedIndex > -1)
+				_selectedJob = lvPrintMonitor.SelectedIndex;
 		}
 	}
 }
