@@ -122,11 +122,16 @@ namespace SpoolerMasterUltimate {
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
 		private void CloseOverlay_Click(object sender, RoutedEventArgs e) {
-			_updateTime.Stop();
-			_settingsWindowAccess.NIcon.Visible = false;
-		   _settingsWindowAccess.NIcon.Dispose();
-			_printManager.Dispose();
-			Application.Current.Shutdown();
+			try {
+				_updateTime.Stop();
+				_printManager.Dispose();
+				Application.Current.Shutdown();
+			}
+			catch (Exception ex) {
+				MessageBox.Show("Error! " + ex.Message + "\n\n" + ex.StackTrace);
+					 Application.Current.Shutdown();
+			}
+			
 		}
 
 		private void LblDate_OnLoaded(object sender, RoutedEventArgs e) {
@@ -209,24 +214,7 @@ namespace SpoolerMasterUltimate {
 		///     Set the lvPrintMonitor source and re-select the print job that was currently selected.
 		/// </summary>
 		private void SetPrintStatus() {
-			var newPrintData = _printManager.GetPrintData();
-			bool printNotSame = _printManager.MainPrintQueue.NumberOfJobs < 1;
-			if (!printNotSame) {
-				foreach (var oldJob in _oldPrintData) {
-					foreach (var newJob in newPrintData) {
-						if (!oldJob.Equals(newJob)) printNotSame = true;
-						if (printNotSame)
-							break;
-					}
-
-					if (printNotSame)
-						break;
-				}
-			}
-			if (printNotSame) {
-				_oldPrintData = newPrintData;
-				lvPrintMonitor.ItemsSource = newPrintData;
-			}
+			lvPrintMonitor.ItemsSource = _printManager.GetPrintData();
 			lvPrintMonitor.SelectedIndex = _selectedJob;
 		}
 

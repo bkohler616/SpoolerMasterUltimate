@@ -60,6 +60,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="LogManager.cs" />
     <Compile Include="PrintJobData.cs" />
     <Compile Include="PrintJobManager.cs" />
     <Compile Include="SelectPrinterWindow.xaml.cs">
