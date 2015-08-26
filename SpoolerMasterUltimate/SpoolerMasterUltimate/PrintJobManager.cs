@@ -8,17 +8,20 @@ using System.Windows;
 
 namespace SpoolerMasterUltimate {
 	internal class PrintJobManager {
-		private PrintQueue _mainPrintQueue;
+		private readonly HistoryViewWindow _historyView;
 
 		public PrintJobManager() {
 			PrinterWindow = new SelectPrinterWindow();
-			LogManager.SetupLog();
 			GetNewPrinter();
+			_historyView = new HistoryViewWindow();
+			CollectedHistory = new List<PrintJobData>();
 		}
 
+		public PrintQueue MainPrintQueue { get; private set; }
 		private PrintServer MainPrintServer { get; set; }
 		public bool PrinterConnection { get; private set; }
 		public SelectPrinterWindow PrinterWindow { get; }
+		private List<PrintJobData> CollectedHistory { get; }
 
 		/// <summary>
 		///     Get the currently installed printers, and populate the PrinterWindow with the printers, and display the window.
@@ -64,7 +67,7 @@ namespace SpoolerMasterUltimate {
 
 				//Iterate through print queues until desired print queue is found.
 				if (isNetwork) {
-					_mainPrintQueue = new PrintQueue(MainPrintServer, PrinterWindow.PrinterSelection,
+					MainPrintQueue = new PrintQueue(MainPrintServer, PrinterWindow.PrinterSelection,
 						PrintSystemDesiredAccess.AdministratePrinter);
 					PrinterConnection = true;
 					logBuild += "\nConnection complete. The print queue is a network printer.";
@@ -73,7 +76,7 @@ namespace SpoolerMasterUltimate {
 					var pqc = MainPrintServer.GetPrintQueues();
 					foreach (var pq in pqc) {
 						if (pq.FullName == PrinterWindow.PrinterSelection) {
-							_mainPrintQueue = pq;
+							MainPrintQueue = pq;
 							PrinterConnection = true;
 							logBuild += "\nConnection complete. The print queue is a local printer.";
 						}
@@ -102,19 +105,19 @@ namespace SpoolerMasterUltimate {
 			try {
 				foreach (PrintJobData printJob in printData) {
 					try {
-						_mainPrintQueue.GetJob(printJob.JobId).Cancel();
+						MainPrintQueue.GetJob(printJob.JobId).Cancel();
 						logBuild += logPrintDataBuilder(printJob, "Delete");
 					}
 					catch (Exception ex) {
 						MessageBox.Show("Error on delete attempt. " + ex.Message + "\n\nThis has been placed into the log.");
-						logBuild += logPrintDataBuilder(printJob, "Delete Failed", ex.Message + " " + ex.InnerException);
+						logBuild += logPrintDataBuilder(printJob, "Delete Failed", ex.Message + " " + ex.StackTrace);
 					}
 				}
 			}
 			catch (Exception ex) {
 				MessageBox.Show("Error on delete attempt. " + ex.Message + "\n\nThis has been placed into the log.");
 				logBuild += LogManager.LogErrorSection + "\nCritical delete method failure. Dump....\n" + ex.Message + " " +
-				            ex.InnerException + LogManager.LogErrorSection;
+				            ex.StackTrace + LogManager.LogErrorSection;
 			}
 			LogManager.AppendLog(logBuild);
 		}
@@ -127,26 +130,26 @@ namespace SpoolerMasterUltimate {
 			var logBuild = LogManager.LogSectionSeperator("Paused Print(s) attempt");
 			try {
 				foreach (PrintJobData printJob in printData) {
-					if (_mainPrintQueue.GetJob(printJob.JobId).IsPaused) {
+					if (MainPrintQueue.GetJob(printJob.JobId).IsPaused) {
 						try {
-							_mainPrintQueue.GetJob(printJob.JobId).Resume();
+							MainPrintQueue.GetJob(printJob.JobId).Resume();
 							logBuild += logPrintDataBuilder(printJob, "Resumed");
 						}
 						catch (Exception ex) {
 							MessageBox.Show("Error on resume attempt. " + ex.Message + "\n\nThis has been placed into the log.");
-							logBuild += logPrintDataBuilder(printJob, "Resume Failed", ex.Message + " " + ex.InnerException);
+							logBuild += logPrintDataBuilder(printJob, "Resume Failed", ex.Message + " " + ex.StackTrace);
 							break;
 						}
 					}
 
 					else {
 						try {
-							_mainPrintQueue.GetJob(printJob.JobId).Pause();
+							MainPrintQueue.GetJob(printJob.JobId).Pause();
 							logBuild += logPrintDataBuilder(printJob, "Paused");
 						}
 						catch (Exception ex) {
 							MessageBox.Show("Error on pause attempt. " + ex.Message + "\n\nThis has been placed into the log.");
-							logBuild += logPrintDataBuilder(printJob, "Pause Failed", ex.Message + " " + ex.InnerException);
+							logBuild += logPrintDataBuilder(printJob, "Pause Failed", ex.Message + " " + ex.StackTrace);
 							break;
 						}
 					}
@@ -155,7 +158,7 @@ namespace SpoolerMasterUltimate {
 			catch (Exception ex) {
 				MessageBox.Show("Critical error on pause attempt(s). Please check the log.");
 				logBuild += LogManager.LogErrorSection + "\nCritical pause method failure. Dump....\n" + ex.Message + " " +
-				            ex.InnerException + LogManager.LogErrorSection;
+				            ex.StackTrace + LogManager.LogErrorSection;
 			}
 			LogManager.AppendLog(logBuild);
 		}
@@ -166,19 +169,19 @@ namespace SpoolerMasterUltimate {
 		/// <returns>A List(PrintJobData) of print jobs currently being sent to the printer.</returns>
 		public List<PrintJobData> GetPrintData() {
 			try {
-				_mainPrintQueue.Refresh();
+				MainPrintQueue.Refresh();
 
-				if (_mainPrintQueue.GetPrintJobInfoCollection().Any()) {
+				if (MainPrintQueue.GetPrintJobInfoCollection().Any()) {
 					var printJobs = new List<PrintJobData>();
 					var logBuild = LogManager.LogSectionSeperator("Print Collection w/ Automation attempt");
-					foreach (var job in _mainPrintQueue.GetPrintJobInfoCollection()) {
+					foreach (var job in MainPrintQueue.GetPrintJobInfoCollection()) {
 						var jobDataBuilder = new PrintJobData {
-							DocumentName = job.JobName,
 							JobId = job.JobIdentifier,
-							Size = job.JobSize.ToString(),
+							Size = job.JobSize,
 							Status = job.JobStatus.ToString(),
-							Pages = job.NumberOfPages.ToString(),
-							User = job.Submitter
+							Pages = job.NumberOfPages,
+							User = job.Submitter,
+							TimeStarted = job.TimeJobSubmitted.ToString("G")
 						};
 						if (job.NumberOfPages >= PrinterWindow.DeletePrintLimit) {
 							try {
@@ -186,7 +189,7 @@ namespace SpoolerMasterUltimate {
 								logBuild += logPrintDataBuilder(jobDataBuilder, "Automated Delete");
 							}
 							catch (Exception ex) {
-								logBuild += logPrintDataBuilder(jobDataBuilder, "Automated Delete Failed", ex.Message + " " + ex.InnerException);
+								logBuild += logPrintDataBuilder(jobDataBuilder, "Automated Delete Failed", ex.Message + " " + ex.StackTrace);
 								MessageBox.Show("Error! a job could not be Auto-Deleted! Please see the log to know why! jobId: " +
 								                jobDataBuilder.JobId);
 							}
@@ -198,11 +201,14 @@ namespace SpoolerMasterUltimate {
 								logBuild += logPrintDataBuilder(jobDataBuilder, "Automated Pause");
 							}
 							catch (Exception ex) {
-								logBuild += logPrintDataBuilder(jobDataBuilder, "Automated Pause Failed", ex.Message + " " + ex.InnerException);
+								logBuild += logPrintDataBuilder(jobDataBuilder, "Automated Pause Failed", ex.Message + " " + ex.StackTrace);
 								MessageBox.Show("Error! a job could not be Auto-Paused! Please see the log to know why! jobId: " +
 								                jobDataBuilder.JobId);
 							}
 						}
+						job.Refresh();
+						jobDataBuilder.Status = job.JobStatus.ToString();
+						CheckPrintHistory(jobDataBuilder);
 						LogManager.AppendLog(logBuild);
 						printJobs.Add(jobDataBuilder);
 					}
@@ -213,7 +219,7 @@ namespace SpoolerMasterUltimate {
 				MessageBox.Show("Critical error upon updating printer information. Please read the log for more details.");
 				LogManager.AppendLog(LogManager.LogErrorSection + "\n" + DateTime.Now +
 				                     "\nDumping Error Information from GetPrintData...\n" + ex.Message +
-				                     "\n\n" + ex.InnerException);
+				                     "\n\n" + ex.StackTrace);
 			}
 			return new List<PrintJobData>();
 		}
@@ -226,24 +232,24 @@ namespace SpoolerMasterUltimate {
 		public string CurrentPrinterStatus() {
 			if (PrinterConnection == false)
 				return "No connection established.";
-			if (_mainPrintQueue.IsOffline)
+			if (MainPrintQueue.IsOffline)
 				return "Printer Offline";
-			if (_mainPrintQueue.IsDoorOpened)
+			if (MainPrintQueue.IsDoorOpened)
 				return "Printer Door Opened";
-			if (_mainPrintQueue.IsPaperJammed)
+			if (MainPrintQueue.IsPaperJammed)
 				return "Printer Jammed";
-			if (_mainPrintQueue.HasPaperProblem)
+			if (MainPrintQueue.HasPaperProblem)
 				return "Unknown paper problem";
-			if (_mainPrintQueue.IsOutOfPaper)
+			if (MainPrintQueue.IsOutOfPaper)
 				return "Printer out of paper";
-			if (_mainPrintQueue.IsTonerLow)
+			if (MainPrintQueue.IsTonerLow)
 				return "Printer toner low";
-			if (_mainPrintQueue.NeedUserIntervention)
+			if (MainPrintQueue.NeedUserIntervention)
 				return "Printer needs love.";
-			return _mainPrintQueue.NumberOfJobs + " jobs, " +
-			       (_mainPrintQueue.QueueStatus.ToString() == "None"
+			return MainPrintQueue.NumberOfJobs + " jobs, " +
+			       (MainPrintQueue.QueueStatus.ToString() == "None"
 				       ? "No Print Issues"
-				       : ("Print Queue " + _mainPrintQueue.QueueStatus));
+				       : ("Print Queue " + MainPrintQueue.QueueStatus));
 		}
 
 		/// <summary>
@@ -253,14 +259,14 @@ namespace SpoolerMasterUltimate {
 		public void Dispose() {
 			var logBuild = LogManager.LogSectionSeperator("Disposal of Queues");
 			try {
-				_mainPrintQueue.Dispose();
+				MainPrintQueue.Dispose();
 			}
 			catch (NullReferenceException) {
 				logBuild += "\n\tDispose queue called with null refrence. This usually happens with lack of setPrinter.";
 			}
 			catch (Exception ex) {
 				MessageBox.Show("Error on disposing _mainPrintQueue! Please view log for more information!");
-				logBuild += "\n\tError on disposing _mainPrintQueue!\n\n" + ex.Message + "\n\n" + ex.InnerException;
+				logBuild += "\n\tError on disposing _mainPrintQueue!\n\n" + ex.Message + "\n\n" + ex.StackTrace;
 			}
 			try {
 				MainPrintServer.Dispose();
@@ -270,7 +276,7 @@ namespace SpoolerMasterUltimate {
 			}
 			catch (Exception ex) {
 				MessageBox.Show("Error on disposing MainPrintServer! Please view log for more information!");
-				logBuild += "\n\tError on disposing MainPrintServer!\n\n" + ex.Message + "\n\n" + ex.InnerException;
+				logBuild += "\n\tError on disposing MainPrintServer!\n\n" + ex.Message + "\n\n" + ex.StackTrace;
 			}
 
 			LogManager.AppendLog(logBuild);
@@ -284,6 +290,19 @@ namespace SpoolerMasterUltimate {
 			if (advError != "") logBuilder += LogManager.LogErrorSection + "\n\t\t-" + advError + LogManager.LogErrorSection;
 
 			return logBuilder;
+		}
+
+		private void CheckPrintHistory(PrintJobData newJob) {
+			var oldJobId = false;
+			foreach (var oldData in CollectedHistory.Where(oldData => oldData.JobId == newJob.JobId)) {
+				oldJobId = true;
+				oldData.CheckFilledData(newJob);
+			}
+			if (!oldJobId) CollectedHistory.Add(newJob);
+		}
+
+		public void ShowHistory() {
+			_historyView.ShowHistory(CollectedHistory);
 		}
 	}
 }

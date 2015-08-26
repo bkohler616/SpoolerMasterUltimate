@@ -46,28 +46,39 @@
 				       Content="Printer Status Loading"
 				       Foreground="White"
 				       FontSize="30" />
-                <ListView
+				<ListView
 					Name="lvPrintMonitor"
 					VerticalAlignment="Bottom"
-					HorizontalAlignment="Right"
+					HorizontalAlignment="Left"
 					Height="100"
 					SelectionChanged="lvPrintMonitor_SelectionChanged"
 					SelectionMode="Extended"
 					Visibility="Hidden">
-						  <ListView.View>
-								<GridView>
-									 <GridViewColumn Header="Job Id" DisplayMemberBinding="{Binding JobId}"/>
-									 <GridViewColumn Header="Document Name" DisplayMemberBinding="{Binding DocumentName}"/>
-                            <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}"/>
-                            <GridViewColumn Header="Pages" DisplayMemberBinding="{Binding Pages}"/>
-                            <GridViewColumn Header="Size" DisplayMemberBinding="{Binding Size}"/>
-                            <GridViewColumn Header="User" DisplayMemberBinding="{Binding User}"/>
-                        </GridView>
-						  </ListView.View>
-					 </ListView>
+					<ListView.View>
+						<GridView>
+							<GridViewColumn Header="Job Id" DisplayMemberBinding="{Binding JobId}" />
+							<!--<GridViewColumn Header="Document Name" DisplayMemberBinding="{Binding DocumentName}"/>-->
+							<GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}" />
+							<GridViewColumn Header="Pages" DisplayMemberBinding="{Binding Pages}" />
+							<GridViewColumn Header="Size" DisplayMemberBinding="{Binding Size}" />
+							<GridViewColumn Header="User" DisplayMemberBinding="{Binding User}" />
+							<GridViewColumn Header="Time Elapsed" DisplayMemberBinding="{Binding TimeElapsed}" />
+						</GridView>
+					</ListView.View>
+				</ListView>
 				<WrapPanel FlowDirection="LeftToRight"
 				           VerticalAlignment="Bottom"
-				           HorizontalAlignment="Right">
+				           HorizontalAlignment="Right"
+				           Name="wpPrinterMonitorButtons"
+				           Visibility="Hidden">
+					<Button Content="View History"
+					        Click="ViewHistory_OnClick"
+					        Margin="5,5,5,5"
+					        Width="100" />
+					<Button Content="Pause Queue"
+					        Click="PauseQueue_OnClick"
+					        Margin="5,5,5,5"
+					        Width="100" />
 					<Button Content="Delete"
 					        Click="PrintJobDelete_OnClick"
 					        Margin="5,5,5,5"

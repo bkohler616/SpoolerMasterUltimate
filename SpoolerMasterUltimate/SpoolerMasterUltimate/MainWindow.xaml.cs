@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Reflection;
@@ -9,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
+using static System.Windows.Visibility;
 
 namespace SpoolerMasterUltimate {
 	/// <summary>
@@ -21,11 +21,11 @@ namespace SpoolerMasterUltimate {
 		private readonly SettingsWindow _settingsWindowAccess;
 		private readonly Timer _updateTime;
 		private DateTime _currentDateTime;
-		private List<PrintJobData> _oldPrintData;
 		private int _selectedJob;
 
 		public MainWindow() {
 			InitializeComponent();
+			LogManager.SetupLog();
 			_updateTime = new Timer {
 				Interval = 500
 			};
@@ -35,7 +35,7 @@ namespace SpoolerMasterUltimate {
 			_updateTime.Start();
 			_selectedJob = 0;
 			_path = (new FileInfo(Assembly.GetEntryAssembly().Location)).Directory + "//SMU_Settings.xml";
-			_oldPrintData = new List<PrintJobData> {new PrintJobData()};
+
 
 			//If settings save exists, deserialize it to SettingsWindow
 			if (File.Exists(_path)) {
@@ -93,17 +93,17 @@ namespace SpoolerMasterUltimate {
 		///     (lblPrinterStatus, lvPrintMonitor, and _printManager)
 		/// </summary>
 		private void PrinterUpdate() {
-		  if (_printManager.PrinterWindow.PrinterGet) {
+			if (_printManager.PrinterWindow.PrinterGet) {
 				_printManager.PrinterWindow.PrinterGet = false;
 				_printManager.UpdatePrintQueue();
-				lvPrintMonitor.Visibility = Visibility.Visible;
-		  }
-		  else if (_printManager.PrinterConnection) SetPrintStatus();
-				lvPrintMonitor.SelectedIndex = _selectedJob;
+				lvPrintMonitor.Visibility = Visible;
+				wpPrinterMonitorButtons.Visibility = Visible;
+			}
+			else if (_printManager.PrinterConnection) SetPrintStatus();
+			lvPrintMonitor.SelectedIndex = _selectedJob;
 
 			lblPrinterStatus.Content = _printManager.CurrentPrinterStatus();
 			lvPrintMonitor.SelectedIndex = _selectedJob;
-
 		}
 
 		/// <summary>
@@ -129,9 +129,8 @@ namespace SpoolerMasterUltimate {
 			}
 			catch (Exception ex) {
 				MessageBox.Show("Error! " + ex.Message + "\n\n" + ex.StackTrace);
-					 Application.Current.Shutdown();
+				Application.Current.Shutdown();
 			}
-			
 		}
 
 		private void LblDate_OnLoaded(object sender, RoutedEventArgs e) {
@@ -226,6 +225,16 @@ namespace SpoolerMasterUltimate {
 		private void lvPrintMonitor_SelectionChanged(object sender, SelectionChangedEventArgs e) {
 			if (lvPrintMonitor.SelectedIndex > -1)
 				_selectedJob = lvPrintMonitor.SelectedIndex;
+		}
+
+		private void PauseQueue_OnClick(object sender, RoutedEventArgs e) {
+			if (_printManager.MainPrintQueue.IsPaused)
+				_printManager.MainPrintQueue.Resume();
+			else _printManager.MainPrintQueue.Pause();
+		}
+
+		private void ViewHistory_OnClick(object sender, RoutedEventArgs e) {
+			_printManager.ShowHistory();
 		}
 	}
 }
