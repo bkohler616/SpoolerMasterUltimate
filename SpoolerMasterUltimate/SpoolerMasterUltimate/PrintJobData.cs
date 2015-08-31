@@ -13,8 +13,10 @@
 		public int Pages { get; set; }
 		public int Size { get; set; }
 		public string User { get; set; }
-		public int TimeElapsed { private get; set; }
+		public string TimeElapsed { private get; set; }
 		public string TimeStarted { get; set; }
+		  public string MachineName { get; set; }
+		  public string DocumentName { get; set; }
 
 		public bool Equals(PrintJobData otherJobData) {
 			if (JobId == otherJobData.JobId)

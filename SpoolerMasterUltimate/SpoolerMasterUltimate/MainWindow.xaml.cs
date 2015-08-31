@@ -228,9 +228,7 @@ namespace SpoolerMasterUltimate {
 		}
 
 		private void PauseQueue_OnClick(object sender, RoutedEventArgs e) {
-			if (_printManager.MainPrintQueue.IsPaused)
-				_printManager.MainPrintQueue.Resume();
-			else _printManager.MainPrintQueue.Pause();
+			_printManager.Pause();
 		}
 
 		private void ViewHistory_OnClick(object sender, RoutedEventArgs e) {

@@ -62,6 +62,8 @@
 							<GridViewColumn Header="Pages" DisplayMemberBinding="{Binding Pages}" />
 							<GridViewColumn Header="Size" DisplayMemberBinding="{Binding Size}" />
 							<GridViewColumn Header="User" DisplayMemberBinding="{Binding User}" />
+							 <GridViewColumn Header="Computer Name" DisplayMemberBinding="{Binding MachineName}"/>
+							 <GridViewColumn Header="Document Name" DisplayMemberBinding="{Binding DocumentName}"/>
 							<GridViewColumn Header="Time Elapsed" DisplayMemberBinding="{Binding TimeElapsed}" />
 						</GridView>
 					</ListView.View>

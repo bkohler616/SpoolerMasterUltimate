@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel;
-using System.Drawing.Printing;
+using System.Collections.Specialized;
 using System.Windows;
 
 namespace SpoolerMasterUltimate {
@@ -24,7 +24,7 @@ namespace SpoolerMasterUltimate {
 		///     Clear the combobox of items, then populate it with currently printer gathered by external source.
 		/// </summary>
 		/// <param name="printers"></param>
-		  public void GetNewPrinters(PrinterSettings.StringCollection printers) {
+		  public void GetNewPrinters(StringCollection printers) {
 			cbPrinterSelection.Items.Clear();
 			foreach (string printer in printers) cbPrinterSelection.Items.Add(printer);
 			if (cbPrinterSelection.Items.Count < 1) MessageBox.Show("Error! No printers installed!");
