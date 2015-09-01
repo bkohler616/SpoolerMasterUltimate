@@ -18,92 +18,96 @@
         ResizeMode="NoResize"
         IsHitTestVisible="True"
         Name="WinMainWindowHandler">
-	<Border Name="BrdrBackground"
-	        CornerRadius="20"
-	        Background="#000000"
-	        Opacity="50">
+    <Border Name="BrdrBackground"
+            CornerRadius="20"
+            Background="#000000"
+            Opacity="50">
 
-		<Border BorderBrush="Transparent"
-		        BorderThickness="5"
-		        CornerRadius="10">
-			<StackPanel
-				Margin="10,0,10,10">
-				<Label Name="LblDate"
-				       VerticalAlignment="Top"
-				       HorizontalAlignment="Left"
-				       Foreground="Gray"
-				       FontSize="15"
-				       Loaded="LblDate_OnLoaded" />
-				<Label Name="LblTime"
-				       VerticalAlignment="Top"
-				       HorizontalAlignment="Left"
-				       Foreground="White"
-				       FontSize="30"
-				       Loaded="LblTime_OnLoaded" />
-				<Label VerticalAlignment="Bottom"
-				       HorizontalAlignment="Right"
-				       Name="lblPrinterStatus"
-				       Content="Printer Status Loading"
-				       Foreground="White"
-				       FontSize="30" />
-				<ListView
-					Name="lvPrintMonitor"
-					VerticalAlignment="Bottom"
-					HorizontalAlignment="Left"
-					Height="100"
-					SelectionChanged="lvPrintMonitor_SelectionChanged"
-					SelectionMode="Extended"
-					Visibility="Hidden">
-					<ListView.View>
-						<GridView>
-							<GridViewColumn Header="Job Id" DisplayMemberBinding="{Binding JobId}" />
-							<!--<GridViewColumn Header="Document Name" DisplayMemberBinding="{Binding DocumentName}"/>-->
-							<GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}" />
-							<GridViewColumn Header="Pages" DisplayMemberBinding="{Binding Pages}" />
-							<GridViewColumn Header="Size" DisplayMemberBinding="{Binding Size}" />
-							<GridViewColumn Header="User" DisplayMemberBinding="{Binding User}" />
-							 <GridViewColumn Header="Computer Name" DisplayMemberBinding="{Binding MachineName}"/>
-							 <GridViewColumn Header="Document Name" DisplayMemberBinding="{Binding DocumentName}"/>
-							<GridViewColumn Header="Time Elapsed" DisplayMemberBinding="{Binding TimeElapsed}" />
-						</GridView>
-					</ListView.View>
-				</ListView>
-				<WrapPanel FlowDirection="LeftToRight"
-				           VerticalAlignment="Bottom"
-				           HorizontalAlignment="Right"
-				           Name="wpPrinterMonitorButtons"
-				           Visibility="Hidden">
-					<Button Content="View History"
-					        Click="ViewHistory_OnClick"
-					        Margin="5,5,5,5"
-					        Width="100" />
-					<Button Content="Pause Queue"
-					        Click="PauseQueue_OnClick"
-					        Margin="5,5,5,5"
-					        Width="100" />
-					<Button Content="Delete"
-					        Click="PrintJobDelete_OnClick"
-					        Margin="5,5,5,5"
-					        Width="100" />
-					<Button Content="Pause/unpause"
-					        Click="PrintJobPause_OnClick"
-					        Margin="5,5,5,5"
-					        Width="100" />
-				</WrapPanel>
-			</StackPanel>
+        <Border BorderBrush="Transparent"
+                BorderThickness="5"
+                CornerRadius="10">
+            <StackPanel
+                Margin="10,0,10,10">
+                <Label Name="LblDate"
+                       VerticalAlignment="Top"
+                       HorizontalAlignment="Left"
+                       Foreground="Gray"
+                       FontSize="15"
+                       Loaded="LblDate_OnLoaded" />
+                <Label Name="LblTime"
+                       VerticalAlignment="Top"
+                       HorizontalAlignment="Left"
+                       Foreground="White"
+                       FontSize="30"
+                       Loaded="LblTime_OnLoaded" />
+                <Label VerticalAlignment="Bottom"
+                       HorizontalAlignment="Right"
+                       Name="LblPrinterStatus"
+                       Content="Printer Status Loading"
+                       Foreground="White"
+                       FontSize="30" />
+                <ListView
+                    Name="LvPrintMonitor"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Left"
+                    Height="100"
+                    SelectionChanged="lvPrintMonitor_SelectionChanged"
+                    SelectionMode="Extended"
+                    Visibility="Hidden">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Job Id" DisplayMemberBinding="{Binding JobId}" />
+                            <!--<GridViewColumn Header="Document Name" DisplayMemberBinding="{Binding DocumentName}"/>-->
+                            <GridViewColumn Header="Status" DisplayMemberBinding="{Binding Status}" />
+                            <GridViewColumn Header="Pages" DisplayMemberBinding="{Binding Pages}" />
+                            <GridViewColumn Header="Size" DisplayMemberBinding="{Binding Size}" />
+                            <GridViewColumn Header="User" DisplayMemberBinding="{Binding User}" />
+                            <GridViewColumn Header="Computer Name" DisplayMemberBinding="{Binding MachineName}" />
+                            <GridViewColumn Header="Document Name" DisplayMemberBinding="{Binding DocumentName}" />
+                            <GridViewColumn Header="Time Elapsed" DisplayMemberBinding="{Binding TimeElapsed}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+                <WrapPanel FlowDirection="LeftToRight"
+                           VerticalAlignment="Bottom"
+                           HorizontalAlignment="Right"
+                           Name="WpPrinterMonitorButtons"
+                           Visibility="Hidden">
+                    <Button Content="View Blocked Users"
+                            Click="ViewBlockedUsers_OnClick"
+                            Margin="5,5,5,5"
+                            Width="130" />
+                    <Button Content="View History"
+                            Click="ViewHistory_OnClick"
+                            Margin="5,5,5,5"
+                            Width="130" />
+                    <Button Content="Pause Queue"
+                            Click="PauseQueue_OnClick"
+                            Margin="5,5,5,5"
+                            Width="130" />
+                    <Button Content="Delete"
+                            Click="PrintJobDelete_OnClick"
+                            Margin="5,5,5,5"
+                            Width="130" />
+                    <Button Content="Pause/unpause"
+                            Click="PrintJobPause_OnClick"
+                            Margin="5,5,5,5"
+                            Width="130" />
+                </WrapPanel>
+            </StackPanel>
 
-		</Border>
-		<Border.ContextMenu>
-			<ContextMenu>
-				<MenuItem Click="CloseOverlay_Click"
-				          Header="_Close" />
-				<MenuItem Click="ShowSettings_Click"
-				          Header="_Settings" />
-				<MenuItem Click="ShowAbout_Click"
-				          Header="_About" />
-				<MenuItem Click="SetPrinter_OnClick"
-				          Header="_Set Printer" />
-			</ContextMenu>
-		</Border.ContextMenu>
-	</Border>
+        </Border>
+        <Border.ContextMenu>
+            <ContextMenu>
+                <MenuItem Click="CloseOverlay_Click"
+                          Header="_Close" />
+                <MenuItem Click="ShowSettings_Click"
+                          Header="_Settings" />
+                <MenuItem Click="ShowAbout_Click"
+                          Header="_About" />
+                <MenuItem Click="SetPrinter_OnClick"
+                          Header="_Set Printer" />
+            </ContextMenu>
+        </Border.ContextMenu>
+    </Border>
 </Window>

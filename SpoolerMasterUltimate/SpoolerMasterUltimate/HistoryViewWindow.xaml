@@ -7,23 +7,24 @@
         mc:Ignorable="d"
         Title="HistoryViewWindow" SizeToContent="WidthAndHeight"
         Closing="HistoryViewWindow_OnClosing">
-	<Grid>
-		<ListView Name="lvPrintHistory"
-		          VerticalAlignment="Bottom"
-		          HorizontalAlignment="Center"
-		          Height="250"
-		          Margin="5,5,5,5"
-		          SelectionMode="Extended">
-			<ListView.View>
-				<GridView>
-					<GridViewColumn Header="Job ID" DisplayMemberBinding="{Binding JobId}" />
-					<GridViewColumn Header="Last Recorded Status" DisplayMemberBinding="{Binding Status}" />
-					<GridViewColumn Header="Highest Pages" DisplayMemberBinding="{Binding Pages}" />
-					<GridViewColumn Header="Time Started" DisplayMemberBinding="{Binding TimeStarted}" />
-					<GridViewColumn Header="Time Elapsed" DisplayMemberBinding="{Binding TimeElapsed}" />
-					<GridViewColumn Header="User" DisplayMemberBinding="{Binding User}" />
-				</GridView>
-			</ListView.View>
-		</ListView>
-	</Grid>
+    <Grid>
+        <ListView Name="lvPrintHistory"
+                  VerticalAlignment="Bottom"
+                  HorizontalAlignment="Center"
+                  Height="250"
+                  Margin="5,5,5,5"
+                  SelectionMode="Extended">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Job ID" DisplayMemberBinding="{Binding JobId}" />
+                    <GridViewColumn Header="Last Recorded Status" DisplayMemberBinding="{Binding Status}" />
+                    <GridViewColumn Header="Highest Pages" DisplayMemberBinding="{Binding Pages}" />
+                    <GridViewColumn Header="Time Started" DisplayMemberBinding="{Binding TimeStarted}" />
+                    <GridViewColumn Header="User" DisplayMemberBinding="{Binding User}" />
+                    <GridViewColumn Header="Machine Name" DisplayMemberBinding="{Binding MachineName}" />
+                    <GridViewColumn Header="Document Name" DisplayMemberBinding="{Binding DocumentName}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+    </Grid>
 </Window>

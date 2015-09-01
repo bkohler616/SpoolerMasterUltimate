@@ -1,0 +1,38 @@
+﻿<Window x:Class="SpoolerMasterUltimate.BlockedUserViewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SpoolerMasterUltimate"
+        mc:Ignorable="d"
+        Title="BlockedUserViewWindow" Height="350" Width="300" SizeToContent="WidthAndHeight"
+        Closing="BlockedUserViewWindow_OnClosing">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ListView Name="lvBlockedUsers"
+                  VerticalAlignment="Bottom"
+                  HorizontalAlignment="Center"
+                  Height="250"
+                  Margin="5,5,5,5"
+                  SelectionMode="Extended"
+                  Grid.Row="0">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn Header="Computer Name" DisplayMemberBinding="{Binding ComputerName}" />
+                    <GridViewColumn Header="User Name" DisplayMemberBinding="{Binding UserName}" />
+                    <GridViewColumn Header="Paused" DisplayMemberBinding="{Binding Paused}" />
+                    <GridViewColumn Header="Time Remaining" DisplayMemberBinding="{Binding TimeRemaining}" />
+                    <GridViewColumn Header="Pages Allocated" DisplayMemberBinding="{Binding PagesAllocated}" />
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <Button Content="Remove Block"
+                Grid.Row="1"
+                Margin="5,5,5,5"
+                Click="RemoveBlock_OnClick" />
+    </Grid>
+</Window>

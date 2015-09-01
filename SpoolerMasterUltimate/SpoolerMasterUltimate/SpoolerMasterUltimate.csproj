@@ -61,10 +61,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BlockedUserWindow.xaml.cs">
+      <DependentUpon>BlockedUserWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="HistoryViewWindow.xaml.cs">
       <DependentUpon>HistoryViewWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="LogManager.cs" />
+    <Compile Include="PrintJobBlocker.cs" />
     <Compile Include="PrintJobData.cs" />
     <Compile Include="PrintJobManager.cs" />
     <Compile Include="SelectPrinterWindow.xaml.cs">
@@ -75,6 +79,10 @@
       <DependentUpon>SettingsWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="BlockedUserWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

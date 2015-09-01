@@ -4,31 +4,38 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Select Printer" Height="130" Width="284.921"
+        Title="Select Printer" Height="200" Width="284.921"
         Closing="SelectPrinterWindow_OnClosing"
         ResizeMode="NoResize">
-	<Grid>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition />
-			<ColumnDefinition />
-		</Grid.ColumnDefinitions>
-		 <Grid.RowDefinitions>
-			  <RowDefinition Height="Auto"/>
-			  <RowDefinition Height="Auto"/>
-			  <RowDefinition Height="Auto"/>
-		 </Grid.RowDefinitions>
-		<ComboBox x:Name="cbPrinterSelection" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120"
-		          Margin="10,10,0,0" Grid.Column="0" Grid.Row="0">
-			<ComboBoxItem Content="test" />
-		</ComboBox>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ComboBox x:Name="cbPrinterSelection" HorizontalAlignment="Left" VerticalAlignment="Top" Width="120"
+                  Margin="10,10,0,0" Grid.Column="0" Grid.Row="0">
+            <ComboBoxItem Content="test" />
+        </ComboBox>
         <Button x:Name="btnAccept" Grid.Column="1" Grid.Row="0" Margin="10,10,10,10"
-		        Content="Accept"
-		        Click="AcceptButton_OnClick" />
-		 <Label Content="Pause Limit:" HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.Column="0" Grid.Row="1"/>
-       <Label Content="Delete Limit:" HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.Column="1" Grid.Row="1"/>
-		 
-		 <TextBox Name="tbPauseLimit" Grid.Column ="0" Grid.Row="2" Margin="5,5,5,5"/>
-        <TextBox Name="tbDeleteLimit" Grid.Column ="1" Grid.Row="2" Margin="5,5,5,5"/>
+                Content="Accept"
+                Click="AcceptButton_OnClick" />
+        <Label Content="Pause Limit:" HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.Column="0"
+               Grid.Row="1" />
+        <Label Content="Delete Limit:" HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.Column="1"
+               Grid.Row="1" />
+
+        <TextBox Name="tbPauseLimit" Grid.Column="0" Grid.Row="2" Margin="5,5,5,5" />
+        <TextBox Name="tbDeleteLimit" Grid.Column="1" Grid.Row="2" Margin="5,5,5,5" />
+
+        <Label Content="Pause Computer Limit:" Grid.Column="0" Grid.Row="3" />
+        <TextBox Name="tbPauseComputerLimit" Grid.Column="0" Grid.Row="4" Margin="5,5,5,5" />
 
 
     </Grid>

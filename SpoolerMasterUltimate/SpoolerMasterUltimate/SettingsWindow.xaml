@@ -10,129 +10,129 @@
         Closing="SettingsWindow_OnClosing"
         Topmost="True"
         ResizeMode="NoResize">
-	<Grid Margin="12,12,12,12">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
-			<RowDefinition Height="Auto" />
-		</Grid.RowDefinitions>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition />
-			<ColumnDefinition Width="70" />
-			<ColumnDefinition Width="30" />
-			<ColumnDefinition />
-			<ColumnDefinition Width="70" />
-		</Grid.ColumnDefinitions>
+    <Grid Margin="12,12,12,12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition Width="70" />
+            <ColumnDefinition Width="30" />
+            <ColumnDefinition />
+            <ColumnDefinition Width="70" />
+        </Grid.ColumnDefinitions>
 
 
-		<Label Content="Return to Defaults"
-		       Grid.Column="0"
-		       Grid.Row="0"
-		       Margin="5,5,5,5"
-		       HorizontalAlignment="Right" />
-		<Button Click="ResetDefault_OnClick"
-		        Grid.Column="1"
-		        Grid.Row="0"
-		        Margin="5,5,5,5"
-		        HorizontalAlignment="Left"
-		        Height="20"
-		        Width="60"
-		        Content="Reset" />
+        <Label Content="Return to Defaults"
+               Grid.Column="0"
+               Grid.Row="0"
+               Margin="5,5,5,5"
+               HorizontalAlignment="Right" />
+        <Button Click="ResetDefault_OnClick"
+                Grid.Column="1"
+                Grid.Row="0"
+                Margin="5,5,5,5"
+                HorizontalAlignment="Left"
+                Height="20"
+                Width="60"
+                Content="Reset" />
 
-		<Label Content="Time Text Color: #"
-		       Grid.Column="0"
-		       Grid.Row="1"
-		       HorizontalAlignment="Right" />
-		<TextBox Name="TbTimeColor"
-		         Grid.Column="1"
-		         Grid.Row="1"
-		         Width="60"
-		         Height="25"
-		         HorizontalAlignment="Left"
-		         Margin="5,5,5,5"
-		         MaxLength="6" />
-		<Image Grid.Column="2"
-		       Grid.Row="1"
-		       Margin="5,5,5,5" />
+        <Label Content="Time Text Color: #"
+               Grid.Column="0"
+               Grid.Row="1"
+               HorizontalAlignment="Right" />
+        <TextBox Name="TbTimeColor"
+                 Grid.Column="1"
+                 Grid.Row="1"
+                 Width="60"
+                 Height="25"
+                 HorizontalAlignment="Left"
+                 Margin="5,5,5,5"
+                 MaxLength="6" />
+        <Image Grid.Column="2"
+               Grid.Row="1"
+               Margin="5,5,5,5" />
 
-		<Label Content="Date Text Color: #"
-		       Grid.Column="0"
-		       Grid.Row="2"
-		       HorizontalAlignment="Right" />
-		<TextBox Name="TbDateColor"
-		         Grid.Column="1"
-		         Grid.Row="2"
-		         Width="60"
-		         Height="25"
-		         HorizontalAlignment="Left"
-		         Margin="5,5,5,5"
-		         MaxLength="6" />
+        <Label Content="Date Text Color: #"
+               Grid.Column="0"
+               Grid.Row="2"
+               HorizontalAlignment="Right" />
+        <TextBox Name="TbDateColor"
+                 Grid.Column="1"
+                 Grid.Row="2"
+                 Width="60"
+                 Height="25"
+                 HorizontalAlignment="Left"
+                 Margin="5,5,5,5"
+                 MaxLength="6" />
 
-		<Label Content="Date Font Size: Pt."
-		       Grid.Column="0"
-		       Grid.Row="3"
-		       HorizontalAlignment="Right" />
-		<TextBox Name="TbDateFontSize"
-		         Grid.Column="1"
-		         Grid.Row="3"
-		         Width="60"
-		         Height="25"
-		         HorizontalAlignment="Left"
-		         Margin="5,5,5,5"
-		         MaxLength="6" />
+        <Label Content="Date Font Size: Pt."
+               Grid.Column="0"
+               Grid.Row="3"
+               HorizontalAlignment="Right" />
+        <TextBox Name="TbDateFontSize"
+                 Grid.Column="1"
+                 Grid.Row="3"
+                 Width="60"
+                 Height="25"
+                 HorizontalAlignment="Left"
+                 Margin="5,5,5,5"
+                 MaxLength="6" />
 
-		<Label Content="Time Font Size: Pt."
-		       Grid.Column="0"
-		       Grid.Row="4"
-		       HorizontalAlignment="Right" />
-		<TextBox Name="TbTimeFontSize"
-		         Grid.Column="1"
-		         Grid.Row="4"
-		         Width="60"
-		         Height="25"
-		         HorizontalAlignment="Left"
-		         Margin="5,5,5,5"
-		         MaxLength="6" />
+        <Label Content="Time Font Size: Pt."
+               Grid.Column="0"
+               Grid.Row="4"
+               HorizontalAlignment="Right" />
+        <TextBox Name="TbTimeFontSize"
+                 Grid.Column="1"
+                 Grid.Row="4"
+                 Width="60"
+                 Height="25"
+                 HorizontalAlignment="Left"
+                 Margin="5,5,5,5"
+                 MaxLength="6" />
 
-		<Label Content="Main Window Opacity: %"
-		       Grid.Column="0"
-		       Grid.Row="5"
-		       HorizontalAlignment="Right" />
-		<TextBox Name="TbBackgroundOpacity"
-		         Grid.Column="1"
-		         Grid.Row="5"
-		         Width="60"
-		         Height="25"
-		         HorizontalAlignment="Left"
-		         Margin="5,5,5,5"
-		         MaxLength="6" />
+        <Label Content="Main Window Opacity: %"
+               Grid.Column="0"
+               Grid.Row="5"
+               HorizontalAlignment="Right" />
+        <TextBox Name="TbBackgroundOpacity"
+                 Grid.Column="1"
+                 Grid.Row="5"
+                 Width="60"
+                 Height="25"
+                 HorizontalAlignment="Left"
+                 Margin="5,5,5,5"
+                 MaxLength="6" />
 
-		<Label Content="Main Window Clickable:"
-		       Grid.Column="0"
-		       Grid.Row="6"
-		       HorizontalAlignment="Right" />
-		<CheckBox Name="CbClickThrough"
-		          Grid.Column="1"
-		          Grid.Row="6"
-		          HorizontalAlignment="Center"
-		          VerticalAlignment="Center"
-		          IsChecked="True"
-		          Unchecked="CbWindowClickable_OnUnchecked"
-		          Checked="CbClickThrough_OnChecked" />
+        <Label Content="Main Window Clickable:"
+               Grid.Column="0"
+               Grid.Row="6"
+               HorizontalAlignment="Right" />
+        <CheckBox Name="CbClickThrough"
+                  Grid.Column="1"
+                  Grid.Row="6"
+                  HorizontalAlignment="Center"
+                  VerticalAlignment="Center"
+                  IsChecked="True"
+                  Unchecked="CbWindowClickable_OnUnchecked"
+                  Checked="CbClickThrough_OnChecked" />
 
-		<Button Grid.Column="3"
-		        Grid.Row="7"
-		        Margin="5,5,5,5"
-		        HorizontalAlignment="Left"
-		        Height="20"
-		        Click="Apply_OnClick"
-		        Content="Apply"
-		        Width="60" />
+        <Button Grid.Column="3"
+                Grid.Row="7"
+                Margin="5,5,5,5"
+                HorizontalAlignment="Left"
+                Height="20"
+                Click="Apply_OnClick"
+                Content="Apply"
+                Width="60" />
 
-	</Grid>
+    </Grid>
 </Window>
