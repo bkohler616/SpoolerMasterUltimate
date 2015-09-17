@@ -1,9 +1,11 @@
-﻿using System.Timers;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Timers;
 
 namespace SpoolerMasterUltimate {
     public class PrintJobBlocker {
         public PrintJobBlocker(PrintJobData printInfo, int setTime, int prntLimit) {
-            ComputerName = printInfo.MachineName;
+            MachineName = printInfo.MachineName;
             UserName = printInfo.User;
             TimeRemaining = setTime;
             TimeAlloted = setTime;
@@ -11,13 +13,16 @@ namespace SpoolerMasterUltimate {
             PrintLimit = prntLimit;
             TimeExhausted = false;
             Paused = printInfo.Pages > PrintLimit;
-            PreviousDocument = printInfo.JobId;
+            PreviousDocument = new List<int>();
+            PreviousDocumentPageChange = new List<int>();
+            PreviousDocument.Add(printInfo.JobId);
+            PreviousDocumentPageChange.Add(printInfo.Pages);
             UpdateTimer = new Timer {Interval = 1000};
             UpdateTimer.Elapsed += UpdateTimerOnElapsed;
             UpdateTimer.Start();
         }
 
-        public string ComputerName { get; set; }
+        public string MachineName { get; set; }
         public string UserName { get; set; }
         public bool Paused { get; set; }
         public bool TimeExhausted { get; set; }
@@ -27,8 +32,8 @@ namespace SpoolerMasterUltimate {
         public int PagesAllocated { get; set; }
         private Timer UpdateTimer { get; }
         public int PrintLimit { get; set; }
-        public int PreviousDocument { get; set; }
-        public int PreviousDocumentPageChange { get; set; }
+        public List<int> PreviousDocument { get; set; }
+        public List<int> PreviousDocumentPageChange { get; set; }
 
         private void UpdateTimerOnElapsed(object sender, ElapsedEventArgs elapsedEventArgs) {
             TimeRemaining += -1;
@@ -36,23 +41,21 @@ namespace SpoolerMasterUltimate {
         }
 
         public void UpdateBlocker(PrintJobData newPrintInfo) {
-            if (PreviousDocument != newPrintInfo.JobId) {
-                TimeRemaining = TimeAlloted;
-                PagesAllocated += newPrintInfo.Pages;
-                Paused = PagesAllocated > PrintLimit;
-                PreviousDocument = newPrintInfo.JobId;
-                PreviousDocumentPageChange = newPrintInfo.Pages;
-            }
-            else {
-                if (PreviousDocumentPageChange > newPrintInfo.Pages) {
-                    PagesAllocated = (PagesAllocated - PreviousDocumentPageChange) + newPrintInfo.Pages;
-                    PreviousDocumentPageChange = newPrintInfo.Pages;
+            if (PreviousDocument.Any(pd => pd == newPrintInfo.JobId)) {
+                var index = PreviousDocument.IndexOf(newPrintInfo.JobId);
+                if (PreviousDocumentPageChange[index] < newPrintInfo.Pages) {
+                    PreviousDocumentPageChange[index] = newPrintInfo.Pages;
+                    PagesAllocated = PreviousDocumentPageChange.Sum();
+                    Paused = PagesAllocated > PrintLimit;
                 }
             }
-        }
-
-        public void Refresh() {
-            TimeRemaining = TimeAlloted;
+            else {
+                TimeRemaining = TimeAlloted;
+                PreviousDocument.Add(newPrintInfo.JobId);
+                PreviousDocumentPageChange.Add(newPrintInfo.Pages);
+                PagesAllocated = PreviousDocumentPageChange.Sum();
+                Paused = PagesAllocated > PrintLimit;
+            }
         }
     }
 }

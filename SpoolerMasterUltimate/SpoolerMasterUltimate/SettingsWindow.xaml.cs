@@ -73,7 +73,6 @@ namespace SpoolerMasterUltimate {
         /// <param name="e"></param>
         private void SettingsWindow_OnClosing(object sender, CancelEventArgs e) {
             if (Settings.CloseApplication) return;
-
             SetSettings();
 
             SetSettingsWindowContent();

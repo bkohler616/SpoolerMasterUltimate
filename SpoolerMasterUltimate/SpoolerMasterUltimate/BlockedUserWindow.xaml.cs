@@ -23,7 +23,7 @@ namespace SpoolerMasterUltimate {
             lvBlockedUsers.ItemsSource = BlockedUsers;
             try {
                 var view = (CollectionView) CollectionViewSource.GetDefaultView(lvBlockedUsers.ItemsSource);
-                view.SortDescriptions.Add(new SortDescription("ComputerName", ListSortDirection.Descending));
+                view.SortDescriptions.Add(new SortDescription("MachineName", ListSortDirection.Descending));
             }
             catch (NullReferenceException) {
                 LogManager.AppendLog(LogManager.LogErrorSection + "\nNo blocked users to sort");

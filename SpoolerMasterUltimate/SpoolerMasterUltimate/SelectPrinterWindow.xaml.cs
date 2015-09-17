@@ -23,6 +23,7 @@ namespace SpoolerMasterUltimate {
         public int PausePrintLimit { get; set; }
         public int DeletePrintLimit { get; set; }
         public int PauseComputerPrintTime { get; set; }
+        public bool AltStatusText { get; set; }
 
         /// <summary>
         ///     Clear the combobox of items, then populate it with currently printer gathered by external source.
@@ -83,6 +84,7 @@ namespace SpoolerMasterUltimate {
                 settingsError = true;
             }
 
+            AltStatusText = cbAltStatText.IsChecked.Value;
             if (settingsError) MessageBox.Show("Error(s):" + errorText);
             PrinterGet = true;
         }

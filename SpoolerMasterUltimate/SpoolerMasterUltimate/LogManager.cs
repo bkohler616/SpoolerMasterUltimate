@@ -5,6 +5,7 @@ using System.Reflection;
 namespace SpoolerMasterUltimate {
     public static class LogManager {
         private const string LogPath = "SMU_PrintLog.log";
+        private static string _previousInfo = "";
 
         public const string LogErrorSection =
             "\n##################******************!!!!!!!!!!!!!!!!!!******************##################";
@@ -19,13 +20,20 @@ namespace SpoolerMasterUltimate {
         }
 
         public static void AppendLog(string addition) {
-            var logFileInfo = new FileInfo(LogPath);
-            if (logFileInfo.Length > 50000000) {
-                File.Delete(LogPath);
-                SetupLog();
-                AppendLog("!!!--Log was purged--!!!");
+            try {
+                _previousInfo += addition;
+                var logFileInfo = new FileInfo(LogPath);
+                if (logFileInfo.Length > 50000000) {
+                    File.Delete(LogPath);
+                    SetupLog();
+                    AppendLog("!!!--Log was purged--!!!");
+                }
+                using (var sw = File.AppendText(LogPath)) sw.WriteLine(_previousInfo);
+                _previousInfo = "";
             }
-            using (var sw = File.AppendText(LogPath)) sw.WriteLine(addition);
+            catch (IOException ex) {
+                _previousInfo += LogErrorSection + "\nIOException: " + ex.Message;
+            }
         }
 
         public static string LogSectionSeperator(string sectionAction) {

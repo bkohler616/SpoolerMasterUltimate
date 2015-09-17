@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="Select Printer" Height="200" Width="284.921"
+        Title="Select Printer" Height="200" Width="317.921"
         Closing="SelectPrinterWindow_OnClosing"
         ResizeMode="NoResize">
     <Grid>
@@ -36,6 +36,9 @@
 
         <Label Content="Pause Computer Limit:" Grid.Column="0" Grid.Row="3" />
         <TextBox Name="tbPauseComputerLimit" Grid.Column="0" Grid.Row="4" Margin="5,5,5,5" />
+        
+        <Label Content="Alternate Status Messages:" Grid.Column="1" Grid.Row="3"/>
+        <CheckBox Name="cbAltStatText" Grid.Column="1" Grid.Row="4" Margin="5,5,5,5" VerticalAlignment="Center" HorizontalAlignment="Center"/>
 
 
     </Grid>

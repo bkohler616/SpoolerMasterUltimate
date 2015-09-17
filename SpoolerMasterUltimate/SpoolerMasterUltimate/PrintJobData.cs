@@ -18,14 +18,6 @@
         public string MachineName { get; set; }
         public string DocumentName { get; set; }
 
-        public bool Equals(PrintJobData otherJobData) {
-            if (JobId == otherJobData.JobId)
-                return Status == otherJobData.Status;
-            return false;
-
-            //return JobId == otherJobData.JobId;
-        }
-
         public void CheckFilledData(PrintJobData newData) {
             if (TimeStarted != newData.TimeStarted) {
                 Status = newData.Status;

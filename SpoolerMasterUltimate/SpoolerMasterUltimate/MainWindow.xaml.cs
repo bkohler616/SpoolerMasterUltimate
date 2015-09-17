@@ -238,5 +238,9 @@ namespace SpoolerMasterUltimate {
         private void ViewBlockedUsers_OnClick(object sender, RoutedEventArgs e) {
             _printManager.ShowBlockedUsers();
         }
+
+        private void PurgeBlockedUsers_OnClick(object sender, RoutedEventArgs e) {
+            _printManager.PurgeBlockedUsers();
+        }
     }
 }

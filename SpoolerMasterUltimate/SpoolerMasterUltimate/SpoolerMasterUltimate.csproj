@@ -68,6 +68,7 @@
       <DependentUpon>HistoryViewWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="LogManager.cs" />
+    <Compile Include="printerStatusFlags.cs" />
     <Compile Include="PrintJobBlocker.cs" />
     <Compile Include="PrintJobData.cs" />
     <Compile Include="PrintJobManager.cs" />

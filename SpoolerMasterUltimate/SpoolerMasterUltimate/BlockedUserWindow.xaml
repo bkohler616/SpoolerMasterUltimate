@@ -21,7 +21,7 @@
                   Grid.Row="0">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="Computer Name" DisplayMemberBinding="{Binding ComputerName}" />
+                    <GridViewColumn Header="Computer Name" DisplayMemberBinding="{Binding MachineName}" />
                     <GridViewColumn Header="User Name" DisplayMemberBinding="{Binding UserName}" />
                     <GridViewColumn Header="Paused" DisplayMemberBinding="{Binding Paused}" />
                     <GridViewColumn Header="Time Remaining" DisplayMemberBinding="{Binding TimeRemaining}" />
