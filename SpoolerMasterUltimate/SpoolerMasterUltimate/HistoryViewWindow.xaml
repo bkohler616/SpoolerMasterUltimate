@@ -8,7 +8,7 @@
         Title="HistoryViewWindow" SizeToContent="WidthAndHeight"
         Closing="HistoryViewWindow_OnClosing">
     <Grid>
-        <ListView Name="lvPrintHistory"
+        <ListView Name="LvPrintHistory"
                   VerticalAlignment="Bottom"
                   HorizontalAlignment="Center"
                   Height="250"

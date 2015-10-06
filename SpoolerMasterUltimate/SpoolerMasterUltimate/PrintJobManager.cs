@@ -89,6 +89,7 @@ namespace SpoolerMasterUltimate {
                     foreach (PrintJobData jobEdit in printData) {
                         if (jobEdit.JobId.ToString() == jobId) {
                             printJob.Delete();
+                            DeleteBlockedJob(jobEdit);
                             logBuild += "\nDelete event handled for " + jobEdit.JobId + " : " +
                                         jobEdit.MachineName;
                         }
@@ -150,9 +151,13 @@ namespace SpoolerMasterUltimate {
                     };
 
                     var autoPause = CheckBlockedList(jobDataBuilder);
-                    if (jobDataBuilder.Pages >= PrinterWindow.DeletePrintLimit) {
+                    if (jobDataBuilder.Pages > PrinterWindow.DeletePrintLimit) {
                         try {
+                            printJob.Properties["StatusMask"].Value = (uint)printJob.Properties["StatusMask"].Value + PrintJobFlags.AutoDelete;
+                            jobDataBuilder.Status = GetCurrentStatus(
+                                printJob.Properties["StatusMask"].Value.ToString(), true);
                             printJob.Delete();
+                            DeleteBlockedJob(jobDataBuilder);
                         }
                         catch (Exception ex) {
                             logBuilder += ("Error on auto delete for job " + jobDataBuilder.JobId + ": " + ex.Message +
@@ -213,6 +218,13 @@ namespace SpoolerMasterUltimate {
             return false;
         }
 
+        private void DeleteBlockedJob(PrintJobData deleteJob) {
+            foreach (var data in BlockedUsers) {
+                if(data.MachineName == deleteJob.MachineName)
+                    data.DeleteJob(deleteJob);
+            }
+        }
+
         private void RemovedExhaustedPause() {
             var tempStore = BlockedUsers.ToArray();
             foreach (var blockedUser in tempStore) {
@@ -253,8 +265,8 @@ namespace SpoolerMasterUltimate {
 
         /// <summary>
         /// </summary>
-        /// <param name="numInfo">an unparsed string containing a uint</param>
-        /// <param name="printJobOrPrinter"> true for print job, false for printer.</param>
+        /// <param name="numInfo">An unparsed string containing a uint</param>
+        /// <param name="printJobOrPrinter">True for print job, false for printer.</param>
         /// <returns></returns>
         private string GetCurrentStatus(string numInfo, bool printJobOrPrinter) {
             var status = uint.Parse(numInfo);
@@ -262,8 +274,8 @@ namespace SpoolerMasterUltimate {
             if (printJobOrPrinter) {
                 if ((status & PrintJobFlags.Error) != 0) statusBuilder += "Error - ";
                 if ((status & PrintJobFlags.Restart) != 0) statusBuilder += "Restart - ";
-                if ((status & PrintJobFlags.User_Intervention_Req) != 0) statusBuilder += "Printer Needs Love - ";
-                if ((status & PrintJobFlags.Blocked_DevQ) != 0) statusBuilder += "The gate is barred - ";
+                if ((status & PrintJobFlags.UserInterventionReq) != 0) statusBuilder += "Printer Needs Love - ";
+                if ((status & PrintJobFlags.BlockedDevQ) != 0) statusBuilder += "The gate is barred - ";
                 if ((status & PrintJobFlags.Deleted) != 0) statusBuilder += "Deleted - ";
                 if ((status & PrintJobFlags.Printed) != 0) statusBuilder += "Printed - ";
                 if ((status & PrintJobFlags.Paperout) != 0) statusBuilder += "No Paper - ";
@@ -271,12 +283,13 @@ namespace SpoolerMasterUltimate {
                 if ((status & PrintJobFlags.Printing) != 0) statusBuilder += "Printing - ";
                 if ((status & PrintJobFlags.Spooling) != 0) statusBuilder += "Spooling - ";
                 if ((status & PrintJobFlags.Deleting) != 0) statusBuilder += "Deleting - ";
-                if ((status & PrintJobFlags.Paused) != 0) statusBuilder += "Paused";
+                if ((status & PrintJobFlags.Paused) != 0) statusBuilder += "Paused - ";
+                if ((status & PrintJobFlags.AutoDelete) != 0) statusBuilder += "Auto Deleted";
             }
             else {
                 if (PrinterWindow.AltStatusText) {
                     if (status == PrinterFlags.ManualFeed) statusBuilder += "Reload Paper. Insert Deeply.";
-                    if (status == PrinterFlags.IOActive) statusBuilder += "Wow IOActive!";
+                    if (status == PrinterFlags.IoActive) statusBuilder += "Wow IOActive!";
                     if (status == PrinterFlags.PendingDeletion) statusBuilder += "Job on the chopping block";
                     if (status == PrinterFlags.PowerSave) statusBuilder += "Counting electric sheep";
                     if (status == PrinterFlags.Initalization) statusBuilder += "Preparing for the uprising...";
@@ -296,7 +309,7 @@ namespace SpoolerMasterUltimate {
                 }
                 else {
                     if (status == PrinterFlags.ManualFeed) statusBuilder += "Printer Manual Feed Required";
-                    if (status == PrinterFlags.IOActive) statusBuilder += "Printer IO Active";
+                    if (status == PrinterFlags.IoActive) statusBuilder += "Printer IO Active";
                     if (status == PrinterFlags.PendingDeletion) statusBuilder += "Printer is Deleting Stuff";
                     if (status == PrinterFlags.PowerSave) statusBuilder += "Printer In Power Save Mode";
                     if (status == PrinterFlags.Initalization) statusBuilder += "Printer Initializing...";

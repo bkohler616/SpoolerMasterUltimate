@@ -20,9 +20,9 @@ namespace SpoolerMasterUltimate {
         public void ShowBlockedUsers(List<PrintJobBlocker> newBlockedUsers) {
             Visibility = Visibility.Visible;
             BlockedUsers = newBlockedUsers;
-            lvBlockedUsers.ItemsSource = BlockedUsers;
+            LvBlockedUsers.ItemsSource = BlockedUsers;
             try {
-                var view = (CollectionView) CollectionViewSource.GetDefaultView(lvBlockedUsers.ItemsSource);
+                var view = (CollectionView) CollectionViewSource.GetDefaultView(LvBlockedUsers.ItemsSource);
                 view.SortDescriptions.Add(new SortDescription("MachineName", ListSortDirection.Descending));
             }
             catch (NullReferenceException) {
@@ -32,7 +32,7 @@ namespace SpoolerMasterUltimate {
 
         private void RemoveBlock_OnClick(object sender, RoutedEventArgs e) {
             RemoveBlocked = true;
-            foreach (PrintJobBlocker blockedUser in lvBlockedUsers.SelectedItems) blockedUser.CancelBlocking = true;
+            foreach (PrintJobBlocker blockedUser in LvBlockedUsers.SelectedItems) blockedUser.CancelBlocking = true;
         }
 
         private void BlockedUserViewWindow_OnClosing(object sender, CancelEventArgs e) {

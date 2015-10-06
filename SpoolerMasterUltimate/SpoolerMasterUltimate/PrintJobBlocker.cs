@@ -57,5 +57,13 @@ namespace SpoolerMasterUltimate {
                 Paused = PagesAllocated > PrintLimit;
             }
         }
+
+        public void DeleteJob(PrintJobData jobToDelete) {
+            var index = PreviousDocument.IndexOf(jobToDelete.JobId);
+            PreviousDocument.RemoveAt(index);
+            PreviousDocumentPageChange.RemoveAt(index);
+            PagesAllocated = PreviousDocumentPageChange.Sum();
+            Paused = PagesAllocated > PrintLimit;
+        }
     }
 }

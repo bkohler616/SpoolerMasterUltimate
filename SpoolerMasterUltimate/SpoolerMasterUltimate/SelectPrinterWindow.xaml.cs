@@ -13,9 +13,9 @@ namespace SpoolerMasterUltimate {
 
         public SelectPrinterWindow() {
             InitializeComponent();
-            tbDeleteLimit.Text = DefaultDeletePrintLimit.ToString();
-            tbPauseLimit.Text = DefaultPausePrintLimit.ToString();
-            tbPauseComputerLimit.Text = DefaultPauseComputerPrintTime.ToString();
+            TbDeleteLimit.Text = DefaultDeletePrintLimit.ToString();
+            TbPauseLimit.Text = DefaultPausePrintLimit.ToString();
+            TbPauseComputerLimit.Text = DefaultPauseComputerPrintTime.ToString();
         }
 
         public bool PrinterGet { get; set; }
@@ -30,10 +30,10 @@ namespace SpoolerMasterUltimate {
         /// </summary>
         /// <param name="printers"></param>
         public void GetNewPrinters(StringCollection printers) {
-            cbPrinterSelection.Items.Clear();
-            foreach (string printer in printers) cbPrinterSelection.Items.Add(printer);
-            if (cbPrinterSelection.Items.Count < 1) MessageBox.Show("Error! No printers installed!");
-            else cbPrinterSelection.SelectedIndex = 0;
+            CbPrinterSelection.Items.Clear();
+            foreach (string printer in printers) CbPrinterSelection.Items.Add(printer);
+            if (CbPrinterSelection.Items.Count < 1) MessageBox.Show("Error! No printers installed!");
+            else CbPrinterSelection.SelectedIndex = 0;
         }
 
         /// <summary>
@@ -54,11 +54,11 @@ namespace SpoolerMasterUltimate {
         /// <param name="e"></param>
         private void AcceptButton_OnClick(object sender, RoutedEventArgs e) {
             Hide();
-            PrinterSelection = cbPrinterSelection.Text;
+            PrinterSelection = CbPrinterSelection.Text;
             bool settingsError = false;
             string errorText = "";
             try {
-                PausePrintLimit = int.Parse(tbPauseLimit.Text);
+                PausePrintLimit = int.Parse(TbPauseLimit.Text);
             }
             catch {
                 PausePrintLimit = DefaultPausePrintLimit;
@@ -67,7 +67,7 @@ namespace SpoolerMasterUltimate {
             }
 
             try {
-                DeletePrintLimit = int.Parse(tbDeleteLimit.Text);
+                DeletePrintLimit = int.Parse(TbDeleteLimit.Text);
             }
             catch {
                 DeletePrintLimit = DefaultDeletePrintLimit;
@@ -76,7 +76,7 @@ namespace SpoolerMasterUltimate {
             }
 
             try {
-                PauseComputerPrintTime = int.Parse(tbPauseComputerLimit.Text);
+                PauseComputerPrintTime = int.Parse(TbPauseComputerLimit.Text);
             }
             catch {
                 PauseComputerPrintTime = DefaultPauseComputerPrintTime;
@@ -84,7 +84,7 @@ namespace SpoolerMasterUltimate {
                 settingsError = true;
             }
 
-            AltStatusText = cbAltStatText.IsChecked.Value;
+            AltStatusText = CbAltStatText.IsChecked.Value;
             if (settingsError) MessageBox.Show("Error(s):" + errorText);
             PrinterGet = true;
         }

@@ -15,9 +15,9 @@ namespace SpoolerMasterUltimate {
 
         public void ShowHistory(List<PrintJobData> printInformation) {
             Visibility = Visibility.Visible;
-            lvPrintHistory.ItemsSource = printInformation;
+            LvPrintHistory.ItemsSource = printInformation;
             try {
-                var view = (CollectionView) CollectionViewSource.GetDefaultView(lvPrintHistory.ItemsSource);
+                var view = (CollectionView) CollectionViewSource.GetDefaultView(LvPrintHistory.ItemsSource);
                 view.SortDescriptions.Add(new SortDescription("TimeStarted", ListSortDirection.Descending));
             }
             catch (NullReferenceException) {

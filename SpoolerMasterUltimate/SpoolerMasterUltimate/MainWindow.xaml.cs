@@ -27,7 +27,7 @@ namespace SpoolerMasterUltimate {
             InitializeComponent();
             LogManager.SetupLog();
             _updateTime = new Timer {
-                Interval = 500
+                Interval = 800
             };
             _currentDateTime = new DateTime();
             _aboutWindow = new About();
@@ -86,7 +86,6 @@ namespace SpoolerMasterUltimate {
             LblTime.FontSize = _settingsWindowAccess.Settings.TimeFontSize;
             LblDate.FontSize = _settingsWindowAccess.Settings.DateFontSize;
             BrdrBackground.Background.Opacity = (_settingsWindowAccess.Settings.WindowOpacityPercentage / 100.0);
-            WinMainWindowHandler.IsHitTestVisible = _settingsWindowAccess.Settings.ClickThrough;
         }
 
         /// <summary>

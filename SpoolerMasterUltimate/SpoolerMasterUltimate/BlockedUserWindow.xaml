@@ -12,7 +12,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ListView Name="lvBlockedUsers"
+        <ListView Name="LvBlockedUsers"
                   VerticalAlignment="Bottom"
                   HorizontalAlignment="Center"
                   Height="250"
