@@ -8,22 +8,22 @@ namespace SpoolerMasterUltimate {
         private static string _previousInfo = "";
 
         public const string LogErrorSection =
-            "\n##################******************!!!!!!!!!!!!!!!!!!******************##################";
+            "\r\n##################******************!!!!!!!!!!!!!!!!!!******************##################";
 
         public static void SetupLog() {
             if (File.Exists(LogPath)) return;
             File.Create(LogPath).Dispose();
-            AppendLog("Printer log for SpoolerMasterUltimate.\nDate created: " + DateTime.Now +
-                      "\nVersion that log file was created: " + Assembly.GetExecutingAssembly().GetName().Version +
-                      "\nFormat of print data info: ::JobID - Pages - Size - User - Action Taken::" +
-                      "\n********************Beginning log********************");
+            AppendLog("Printer log for SpoolerMasterUltimate.\r\nDate created: " + DateTime.Now +
+                      "\r\nVersion that log file was created: " + Assembly.GetExecutingAssembly().GetName().Version +
+                      "\r\nFormat of print data info: ::JobID - Pages - Size - User - Action Taken::" +
+                      "\r\n********************Beginning log********************");
         }
 
         public static void AppendLog(string addition) {
             try {
                 _previousInfo += addition;
                 var logFileInfo = new FileInfo(LogPath);
-                if (logFileInfo.Length > 50000000) {
+                if (logFileInfo.Length > 10000000) {
                     File.Delete(LogPath);
                     SetupLog();
                     AppendLog("!!!--Log was purged--!!!");
@@ -32,12 +32,12 @@ namespace SpoolerMasterUltimate {
                 _previousInfo = "";
             }
             catch (IOException ex) {
-                _previousInfo += LogErrorSection + "\nIOException: " + ex.Message;
+                _previousInfo += LogErrorSection + "\r\nIOException: " + ex.Message;
             }
         }
 
         public static string LogSectionSeperator(string sectionAction) {
-            return "---\n" + sectionAction + " - " + DateTime.Now;
+            return "---\r\n" + sectionAction + " - " + DateTime.Now;
         }
     }
 }

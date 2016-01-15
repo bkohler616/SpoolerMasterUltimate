@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SpoolerMasterUltimate"
         mc:Ignorable="d"
-        Title="BlockedUserViewWindow" Height="350" Width="300" SizeToContent="WidthAndHeight"
+        Title="Blocked Users" Height="350" Width="300" SizeToContent="WidthAndHeight"
         Closing="BlockedUserViewWindow_OnClosing">
     <Grid>
         <Grid.RowDefinitions>

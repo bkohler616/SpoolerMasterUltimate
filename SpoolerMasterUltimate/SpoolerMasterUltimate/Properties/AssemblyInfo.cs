@@ -8,11 +8,11 @@ using System.Windows;
 // associated with an assembly.
 
 [assembly: AssemblyTitle("SpoolerMasterUltimate")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("An open source print monitor!")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("BenKohler.com")]
 [assembly: AssemblyProduct("SpoolerMasterUltimate")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCopyright("Copyright © Ben Kohler  2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -53,7 +53,7 @@ using System.Windows;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("0.1.4.0")]
-[assembly: AssemblyFileVersion("0.1.4.0")]
+[assembly: AssemblyVersion("0.1.5.0")]
+[assembly: AssemblyFileVersion("0.1.5.0")]
 [assembly: NeutralResourcesLanguage("en")]
 

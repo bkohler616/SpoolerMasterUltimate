@@ -92,16 +92,16 @@ namespace SpoolerMasterUltimate {
         ///     Update printer information.
         ///     (lblPrinterStatus, lvPrintMonitor, and _printManager)
         /// </summary>
-        private void PrinterUpdate() {
+        private void PrinterUpdate()
+        {
+            _printManager.IsPrinterListCollected = false;
             if (_printManager.PrinterWindow.PrinterGet) {
                 _printManager.PrinterWindow.PrinterGet = false;
                 _printManager.UpdatePrintQueue();
                 LvPrintMonitor.Visibility = Visible;
                 WpPrinterMonitorButtons.Visibility = Visible;
             }
-            else if (_printManager.PrinterConnection) SetPrintStatus();
-            LvPrintMonitor.SelectedIndex = _selectedJob;
-
+            else if (_printManager.IsPrinterConnected) SetPrintStatus();
             LblPrinterStatus.Content = _printManager.CurrentPrinterStatus();
             LvPrintMonitor.SelectedIndex = _selectedJob;
         }

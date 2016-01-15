@@ -22,53 +22,92 @@ namespace SpoolerMasterUltimate {
             BlockedUsers = new List<PrintJobBlocker>();
         }
 
-        public bool PrinterConnection { get; private set; }
+        public bool IsPrinterConnected { get; private set; }
         public SelectPrinterWindow PrinterWindow { get; }
         private BlockedUserViewWindow BlockedUserWindow { get; }
         private List<PrintJobData> CollectedHistory { get; }
         private List<PrintJobBlocker> BlockedUsers { get; }
 
+        public bool IsPrinterListCollected { private get; set; }
+        private ManagementObjectCollection PrinterCollection { get; set; }
+
+        /// <summary>
+        /// Get the collection of printers from installed printers.
+        /// A few methods utilize this to get information about the printer.
+        /// </summary>
+        private void GetPrinterCollection()
+        {
+            var logBuild = LogManager.LogSectionSeperator("Get Printer Attempt");
+            try
+            {
+                var searchQuery = "SELECT * FROM Win32_Printer";
+                var searchPrinters = new ManagementObjectSearcher(searchQuery);
+                PrinterCollection = searchPrinters.Get();
+                IsPrinterListCollected = true;
+            }
+            catch (Exception ex)
+            {
+                LogManager.AppendLog(logBuild + "\r\n" + LogManager.LogErrorSection +
+                                     "\r\nCritical error when getting printer! " +
+                                     ex.Message + "\r\n" + ex.InnerException + "\r\n" + ex.StackTrace);
+            }
+            LogManager.AppendLog(logBuild);
+            
+            
+        }
+
+        /// <summary>
+        /// Get the collection of printers from SetPrinterSearch, and give the name information to the PrinterWindow
+        /// </summary>
         public void GetNewPrinter() {
             var printerNameCollection = new StringCollection();
-            var searchQuery = "SELECT * FROM Win32_Printer";
-            var searchPrinters =
-                new ManagementObjectSearcher(searchQuery);
-            var printerCollection = searchPrinters.Get();
-            foreach (var o in printerCollection) {
+            if (!IsPrinterListCollected)
+            {
+                GetPrinterCollection();
+            }
+            foreach (var o in PrinterCollection) {
                 var printer = (ManagementObject) o;
                 printerNameCollection.Add(printer.Properties["Name"].Value.ToString());
             }
             PrinterWindow.GetNewPrinters(printerNameCollection);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public void UpdatePrintQueue() {
-            var logBuild = LogManager.LogSectionSeperator("Get Printer Attempt");
+            var logBuild = LogManager.LogSectionSeperator("Update Print Queue");
             try {
-                var searchQuery = "SELECT * FROM Win32_Printer";
-                var searchPrinters = new ManagementObjectSearcher(searchQuery);
-                var printerCollection = searchPrinters.Get();
-                foreach (var o in printerCollection) {
+                if (!IsPrinterListCollected)
+                {
+                    GetPrinterCollection();
+                }
+                
+                foreach (var o in PrinterCollection)
+                {
                     var printer = (ManagementObject) o;
                     if (printer.Properties["Name"].Value.ToString() == PrinterWindow.PrinterSelection) {
                         //MessageBox.Show(printer.Properties["Location"].Value.ToString());
-                        PrinterConnection = true;
+                        IsPrinterConnected = true;
                     }
                 }
                 LogManager.AppendLog(logBuild);
             }
             catch (Exception ex) {
-                LogManager.AppendLog(logBuild + "\n" + LogManager.LogErrorSection +
-                                     "\nCritical error when getting printer! " +
-                                     ex.Message + "\n" + ex.InnerException + "\n" + ex.StackTrace);
+                LogManager.AppendLog(logBuild + "\r\n" + LogManager.LogErrorSection +
+                                     "\r\nCritical error when updating printer info! " +
+                                     ex.Message + "\r\n" + ex.InnerException + "\r\n" + ex.StackTrace);
             }
         }
 
         public string CurrentPrinterStatus() {
             RemovedExhaustedPause();
-            var searchQuery = "SELECT * FROM Win32_Printer";
-            var searchPrinters = new ManagementObjectSearcher(searchQuery);
-            var printerCollection = searchPrinters.Get();
-            foreach (var o in printerCollection) {
+            if (!IsPrinterListCollected)
+            {
+                GetPrinterCollection();
+            }
+            foreach (var o in PrinterCollection)
+            {
                 var printer = (ManagementObject) o;
                 if (printer.Properties["Name"].Value.ToString() == PrinterWindow.PrinterSelection) 
                     return GetCurrentStatus(printer.Properties["ExtendedPrinterStatus"].Value.ToString(), false);
@@ -90,14 +129,14 @@ namespace SpoolerMasterUltimate {
                         if (jobEdit.JobId.ToString() == jobId) {
                             printJob.Delete();
                             DeleteBlockedJob(jobEdit);
-                            logBuild += "\nDelete event handled for " + jobEdit.JobId + " : " +
+                            logBuild += "\r\nDelete event handled for " + jobEdit.JobId + " : " +
                                         jobEdit.MachineName;
                         }
                     }
                 }
             }
             catch (Exception ex) {
-                logBuild += "Error on delete: " + ex.Message + "\n\n" + ex.StackTrace;
+                logBuild += "Error on delete: " + ex.Message + "\r\n\r\n" + ex.StackTrace;
             }
             LogManager.AppendLog(logBuild);
         }
@@ -115,7 +154,7 @@ namespace SpoolerMasterUltimate {
                         if (jobEdit.JobId.ToString() == jobId) {
                             printJob.InvokeMethod(
                                 (Convert.ToUInt32(printJob.Properties["StatusMask"].Value.ToString()) & PrintJobFlags.Paused) != 0 ? "Resume" : "Pause", null);
-                            logBuild += "\nPause/Resume event handled for " + jobEdit.JobId + " : " +
+                            logBuild += "\r\nPause/Resume event handled for " + jobEdit.JobId + " : " +
                                         jobEdit.MachineName;
                             
                         }
@@ -123,7 +162,7 @@ namespace SpoolerMasterUltimate {
                 }
             }
             catch (Exception ex) {
-                logBuild += ("Error on delete: " + ex.Message + "\n\n" + ex.StackTrace);
+                logBuild += ("Error on delete: " + ex.Message + "\r\n\r\n" + ex.StackTrace);
             }
             LogManager.AppendLog(logBuild);
         }
@@ -161,7 +200,7 @@ namespace SpoolerMasterUltimate {
                         }
                         catch (Exception ex) {
                             logBuilder += ("Error on auto delete for job " + jobDataBuilder.JobId + ": " + ex.Message +
-                                           "\n\n" + ex.StackTrace);
+                                           "\r\n\r\n" + ex.StackTrace);
                         }
                     }
                     else if (autoPause || jobDataBuilder.Pages > PrinterWindow.PausePrintLimit) {
@@ -170,10 +209,10 @@ namespace SpoolerMasterUltimate {
                         }
                         catch (Exception ex) {
                             logBuilder += ("Error on auto pause for job " + jobDataBuilder.JobId + ": " + ex.Message +
-                                           "\n\n" + ex.StackTrace);
+                                           "\r\n\r\n" + ex.StackTrace);
                         }
                     }
-                    logBuilder += "\n Job parsed: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName + " : " +
+                    logBuilder += "\r\n Job parsed: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName + " : " +
                                   (autoPause
                                       ? "Paused"
                                       : "Allowed");
@@ -184,9 +223,9 @@ namespace SpoolerMasterUltimate {
                 return printJobs;
             }
             catch (Exception ex) {
-                MessageBox.Show("Critical error on updating printer information: " + ex.Message + "\n\n" + ex.StackTrace +
-                                "\n\n" +
-                                ex.InnerException + "\n\nList of items: ");
+                MessageBox.Show("Critical error on updating printer information: " + ex.Message + "\r\n\r\n" + ex.StackTrace +
+                                "\r\n\r\n" +
+                                ex.InnerException + "\r\n\r\nList of items: ");
             }
             LogManager.AppendLog(logBuilder);
             return new List<PrintJobData>();
@@ -245,10 +284,12 @@ namespace SpoolerMasterUltimate {
         }
 
         public void PausePrinter() {
-            var searchQuery = "SELECT * FROM Win32_Printer";
-            var searchPrinters = new ManagementObjectSearcher(searchQuery);
-            var printerCollection = searchPrinters.Get();
-            foreach (var o in printerCollection) {
+            if (!IsPrinterListCollected)
+            {
+                GetPrinterCollection();
+            }
+            foreach (var o in PrinterCollection)
+            {
                 var printer = (ManagementObject) o;
                 if (printer.Properties["Name"].Value.ToString() == PrinterWindow.PrinterSelection) {
                     printer.InvokeMethod(printer.Properties["ExtendedPrinterStatus"].Value.ToString() ==

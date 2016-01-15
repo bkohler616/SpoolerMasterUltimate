@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SpoolerMasterUltimate"
         mc:Ignorable="d"
-        Title="HistoryViewWindow" SizeToContent="WidthAndHeight"
+        Title="History" SizeToContent="WidthAndHeight"
         Closing="HistoryViewWindow_OnClosing">
     <Grid>
         <ListView Name="LvPrintHistory"
