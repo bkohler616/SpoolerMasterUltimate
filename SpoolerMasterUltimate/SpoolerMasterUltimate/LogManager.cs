@@ -32,7 +32,7 @@ namespace SpoolerMasterUltimate {
                 _previousInfo = "";
             }
             catch (IOException ex) {
-                _previousInfo += LogErrorSection + "\r\nIOException: " + ex.Message;
+                _previousInfo += "\r\n" +LogErrorSection + "\r\nIOException: " + ex.Message;
             }
         }
 

@@ -97,7 +97,7 @@ namespace SpoolerMasterUltimate {
             _printManager.IsPrinterListCollected = false;
             if (_printManager.PrinterWindow.PrinterGet) {
                 _printManager.PrinterWindow.PrinterGet = false;
-                _printManager.UpdatePrintQueue();
+                _printManager.CheckPrinterConnection();
                 LvPrintMonitor.Visibility = Visible;
                 WpPrinterMonitorButtons.Visibility = Visible;
             }
@@ -212,7 +212,7 @@ namespace SpoolerMasterUltimate {
         ///     Set the lvPrintMonitor source and re-select the print job that was currently selected.
         /// </summary>
         private void SetPrintStatus() {
-            LvPrintMonitor.ItemsSource = _printManager.GetPrintData();
+            LvPrintMonitor.ItemsSource = _printManager.GetPrintDataMultithreaded();
             LvPrintMonitor.SelectedIndex = _selectedJob;
         }
 
