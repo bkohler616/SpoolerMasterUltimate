@@ -2,11 +2,14 @@
 using System.ComponentModel;
 using System.Windows;
 
-namespace SpoolerMasterUltimate {
+
+namespace SpoolerMasterUltimate
+{
     /// <summary>
     ///     Interaction logic for SelectPrinterWindow.xaml
     /// </summary>
-    public partial class SelectPrinterWindow {
+    public partial class SelectPrinterWindow
+    {
         private const int DefaultPausePrintLimit = 10;
         private const int DefaultDeletePrintLimit = 20;
         private const int DefaultPauseComputerPrintTime = 300;
@@ -31,7 +34,7 @@ namespace SpoolerMasterUltimate {
         /// <param name="printers"></param>
         public void GetNewPrinters(StringCollection printers) {
             CbPrinterSelection.Items.Clear();
-            foreach (string printer in printers) CbPrinterSelection.Items.Add(printer);
+            foreach (var printer in printers) CbPrinterSelection.Items.Add(printer);
             if (CbPrinterSelection.Items.Count < 1) MessageBox.Show("Error! No printers installed!");
             else CbPrinterSelection.SelectedIndex = 0;
         }
@@ -55,8 +58,8 @@ namespace SpoolerMasterUltimate {
         private void AcceptButton_OnClick(object sender, RoutedEventArgs e) {
             Hide();
             PrinterSelection = CbPrinterSelection.Text;
-            bool settingsError = false;
-            string errorText = "";
+            var settingsError = false;
+            var errorText = "";
             try {
                 PausePrintLimit = int.Parse(TbPauseLimit.Text);
             }

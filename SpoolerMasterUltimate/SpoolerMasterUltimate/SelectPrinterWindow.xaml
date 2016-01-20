@@ -36,9 +36,10 @@
 
         <Label Content="Pause Computer Limit:" Grid.Column="0" Grid.Row="3" />
         <TextBox Name="TbPauseComputerLimit" Grid.Column="0" Grid.Row="4" Margin="5,5,5,5" />
-        
-        <Label Content="Alternate Status Messages:" Grid.Column="1" Grid.Row="3"/>
-        <CheckBox Name="CbAltStatText" Grid.Column="1" Grid.Row="4" Margin="5,5,5,5" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+        <Label Content="Alternate Status Messages:" Grid.Column="1" Grid.Row="3" />
+        <CheckBox Name="CbAltStatText" Grid.Column="1" Grid.Row="4" Margin="5,5,5,5" VerticalAlignment="Center"
+                  HorizontalAlignment="Center" />
 
 
     </Grid>

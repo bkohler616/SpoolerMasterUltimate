@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
@@ -10,11 +11,14 @@ using System.Windows.Media;
 using System.Xml.Serialization;
 using static System.Windows.Visibility;
 
-namespace SpoolerMasterUltimate {
+
+namespace SpoolerMasterUltimate
+{
     /// <summary>
     ///     Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow {
+    public partial class MainWindow
+    {
         private static string _path;
         private readonly About _aboutWindow;
         private readonly PrintJobManager _printManager;
@@ -27,14 +31,14 @@ namespace SpoolerMasterUltimate {
             InitializeComponent();
             LogManager.SetupLog();
             _updateTime = new Timer {
-                Interval = 800
-            };
+                                        Interval = 500
+                                    };
             _currentDateTime = new DateTime();
             _aboutWindow = new About();
             _updateTime.Elapsed += UpdateTime_Elapsed;
             _updateTime.Start();
-            _selectedJob = 0;
-            _path = (new FileInfo(Assembly.GetEntryAssembly().Location)).Directory + "//SMU_Settings.xml";
+            _selectedJob = 1;
+            _path = new FileInfo(Assembly.GetEntryAssembly().Location).Directory + "//SMU_Settings.xml";
 
 
             //If settings save exists, deserialize it to SettingsWindow
@@ -64,9 +68,9 @@ namespace SpoolerMasterUltimate {
             _currentDateTime = DateTime.Now;
             //Invoke another thread to input content
             Application.Current.Dispatcher.BeginInvoke((Action) delegate {
-                SettingsUpdate();
-                PrinterUpdate();
-            });
+                                                                    SettingsUpdate();
+                                                                    PrinterUpdate();
+                                                                });
             _updateTime.Start();
         }
 
@@ -85,15 +89,14 @@ namespace SpoolerMasterUltimate {
             LblTime.Content = _currentDateTime.ToString("hh:mm:ss tt");
             LblTime.FontSize = _settingsWindowAccess.Settings.TimeFontSize;
             LblDate.FontSize = _settingsWindowAccess.Settings.DateFontSize;
-            BrdrBackground.Background.Opacity = (_settingsWindowAccess.Settings.WindowOpacityPercentage / 100.0);
+            BrdrBackground.Background.Opacity = _settingsWindowAccess.Settings.WindowOpacityPercentage/100.0;
         }
 
         /// <summary>
         ///     Update printer information.
         ///     (lblPrinterStatus, lvPrintMonitor, and _printManager)
         /// </summary>
-        private void PrinterUpdate()
-        {
+        private void PrinterUpdate() {
             _printManager.IsPrinterListCollected = false;
             if (_printManager.PrinterWindow.PrinterGet) {
                 _printManager.PrinterWindow.PrinterGet = false;
@@ -111,9 +114,7 @@ namespace SpoolerMasterUltimate {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Window_MouseDown(object sender, MouseButtonEventArgs e) {
-            if (e.ChangedButton == MouseButton.Left) DragMove();
-        }
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e) { if (e.ChangedButton == MouseButton.Left) DragMove(); }
 
         /// <summary>
         ///     In context-menu item
@@ -132,13 +133,9 @@ namespace SpoolerMasterUltimate {
             }
         }
 
-        private void LblDate_OnLoaded(object sender, RoutedEventArgs e) {
-            LblDate.Content = "Getting Date...";
-        }
+        private void LblDate_OnLoaded(object sender, RoutedEventArgs e) { LblDate.Content = "Getting Date..."; }
 
-        private void LblTime_OnLoaded(object sender, RoutedEventArgs e) {
-            LblTime.Content = "Getting Time...";
-        }
+        private void LblTime_OnLoaded(object sender, RoutedEventArgs e) { LblTime.Content = "Getting Time..."; }
 
         /// <summary>
         ///     In context-menu item
@@ -146,9 +143,7 @@ namespace SpoolerMasterUltimate {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ShowSettings_Click(object sender, RoutedEventArgs e) {
-            _settingsWindowAccess.Show();
-        }
+        private void ShowSettings_Click(object sender, RoutedEventArgs e) { _settingsWindowAccess.Show(); }
 
         /// <summary>
         ///     In context-menu item
@@ -156,9 +151,7 @@ namespace SpoolerMasterUltimate {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ShowAbout_Click(object sender, RoutedEventArgs e) {
-            _aboutWindow.Show();
-        }
+        private void ShowAbout_Click(object sender, RoutedEventArgs e) { _aboutWindow.Show(); }
 
         /// <summary>
         ///     Try to save the application on close.
@@ -195,29 +188,27 @@ namespace SpoolerMasterUltimate {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void PrintJobDelete_OnClick(object sender, RoutedEventArgs e) {
-            _printManager.DeletePrintJobs(LvPrintMonitor.SelectedItems);
-        }
+        private void PrintJobDelete_OnClick(object sender, RoutedEventArgs e) { _printManager.DeletePrintJobs(LvPrintMonitor.SelectedItems); }
 
         /// <summary>
         ///     Attempt to pause print job(s) selected in lvPrintMonitor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void PrintJobPause_OnClick(object sender, RoutedEventArgs e) {
-            _printManager.PausePrintJobs(LvPrintMonitor.SelectedItems);
-        }
+        private void PrintJobPause_OnClick(object sender, RoutedEventArgs e) { _printManager.PausePrintJobs(LvPrintMonitor.SelectedItems); }
 
         /// <summary>
         ///     Set the lvPrintMonitor source and re-select the print job that was currently selected.
         /// </summary>
         private void SetPrintStatus() {
-            LvPrintMonitor.ItemsSource = _printManager.GetPrintDataMultithreaded();
+            var itemList = _printManager.GetPrintDataMultithreaded();
+            itemList = itemList.OrderBy(o => o.JobId).ToList(); //Due to multithreading speeds, the array is sorted by JobId before setting the ItemsSource.
+            LvPrintMonitor.ItemsSource = itemList;
             LvPrintMonitor.SelectedIndex = _selectedJob;
         }
 
         /// <summary>
-        ///     On selection change in lvPrintMonitor, get the newly selected job.
+        ///     On selection change in lvPrintMonitor, set the selected job to the new job.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -226,20 +217,12 @@ namespace SpoolerMasterUltimate {
                 _selectedJob = LvPrintMonitor.SelectedIndex;
         }
 
-        private void PauseQueue_OnClick(object sender, RoutedEventArgs e) {
-            _printManager.PausePrinter();
-        }
+        private void PauseQueue_OnClick(object sender, RoutedEventArgs e) { _printManager.PausePrinter(); }
 
-        private void ViewHistory_OnClick(object sender, RoutedEventArgs e) {
-            _printManager.ShowHistory();
-        }
+        private void ViewHistory_OnClick(object sender, RoutedEventArgs e) { _printManager.ShowHistory(); }
 
-        private void ViewBlockedUsers_OnClick(object sender, RoutedEventArgs e) {
-            _printManager.ShowBlockedUsers();
-        }
+        private void ViewBlockedUsers_OnClick(object sender, RoutedEventArgs e) { _printManager.ShowBlockedUsers(); }
 
-        private void PurgeBlockedUsers_OnClick(object sender, RoutedEventArgs e) {
-            _printManager.PurgeBlockedUsers();
-        }
+        private void PurgeBlockedUsers_OnClick(object sender, RoutedEventArgs e) { _printManager.PurgeBlockedUsers(); }
     }
 }

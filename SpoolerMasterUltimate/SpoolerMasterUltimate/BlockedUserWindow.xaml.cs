@@ -4,11 +4,14 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
 
-namespace SpoolerMasterUltimate {
+
+namespace SpoolerMasterUltimate
+{
     /// <summary>
     ///     Interaction logic for BlockedUserViewWindow.xaml
     /// </summary>
-    public partial class BlockedUserViewWindow : Window {
+    public partial class BlockedUserViewWindow : Window
+    {
         public BlockedUserViewWindow() {
             InitializeComponent();
             BlockedUsers = new List<PrintJobBlocker>();

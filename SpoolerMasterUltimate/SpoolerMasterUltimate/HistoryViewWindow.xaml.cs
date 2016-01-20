@@ -4,14 +4,15 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
 
-namespace SpoolerMasterUltimate {
+
+namespace SpoolerMasterUltimate
+{
     /// <summary>
     ///     Interaction logic for HistoryViewWindow.xaml
     /// </summary>
-    public partial class HistoryViewWindow : Window {
-        public HistoryViewWindow() {
-            InitializeComponent();
-        }
+    public partial class HistoryViewWindow : Window
+    {
+        public HistoryViewWindow() { InitializeComponent(); }
 
         public void ShowHistory(List<PrintJobData> printInformation) {
             Visibility = Visibility.Visible;

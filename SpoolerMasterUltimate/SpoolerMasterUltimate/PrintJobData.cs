@@ -1,12 +1,12 @@
-﻿namespace SpoolerMasterUltimate {
+﻿namespace SpoolerMasterUltimate
+{
     /// <summary>
     ///     PrintJobData is a class that's like PrintSystemJobInfo, but much more slimmed down. This way the dgPrintManager
     ///     grid gets populated with only what we want to see.
     /// </summary>
-    public class PrintJobData {
-        public PrintJobData() {
-            JobId = -5;
-        }
+    public class PrintJobData
+    {
+        public PrintJobData() { JobId = -5; }
 
         public int JobId { get; set; }
         public string Status { private get; set; }

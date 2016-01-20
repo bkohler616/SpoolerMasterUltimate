@@ -1,6 +1,9 @@
-﻿namespace SpoolerMasterUltimate {
-    public static class PrinterStatusFlagInfo {
-        public static class PrintJobStatusFlags {
+﻿namespace SpoolerMasterUltimate
+{
+    public static class PrinterStatusFlagInfo
+    {
+        public static class PrintJobStatusFlags
+        {
             public const uint Paused = 0x1;
             public const uint Error = 0x2;
             public const uint Deleting = 0x4;
@@ -16,7 +19,8 @@
             public const uint AutoDelete = 0x1000;
         }
 
-        public static class PrinterStatusFlags {
+        public static class PrinterStatusFlags
+        {
             public const uint Other = 0x1;
             public const uint Unknown = 0x2;
             public const uint Idle = 0x3;
@@ -35,7 +39,6 @@
             public const uint PendingDeletion = 0x10;
             public const uint IoActive = 0x11;
             public const uint ManualFeed = 0x12;
-
         }
     }
 }

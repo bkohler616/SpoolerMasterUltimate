@@ -1,5 +1,7 @@
-﻿namespace SpoolerMasterUltimate {
-    public class SettingsInfo {
+﻿namespace SpoolerMasterUltimate
+{
+    public class SettingsInfo
+    {
         private const int TimeFontSizeDefault = 30;
         private const int DateFontSizeDefault = 15;
         private const string TimeTextColorDefault = "ffffff";
@@ -20,29 +22,17 @@
         public int WindowOpacityPercentage { get; set; }
         public bool ClickThrough { get; set; }
 
-        public void DefaultTimeColor() {
-            TimeTextColor = TimeTextColorDefault;
-        }
+        public void DefaultTimeColor() { TimeTextColor = TimeTextColorDefault; }
 
-        public void DefaultDateColor() {
-            DateTextColor = DateTextColorDefault;
-        }
+        public void DefaultDateColor() { DateTextColor = DateTextColorDefault; }
 
-        public void DefaultTimeFontSize() {
-            TimeFontSize = TimeFontSizeDefault;
-        }
+        public void DefaultTimeFontSize() { TimeFontSize = TimeFontSizeDefault; }
 
-        public void DefaultDateFontSize() {
-            DateFontSize = DateFontSizeDefault;
-        }
+        public void DefaultDateFontSize() { DateFontSize = DateFontSizeDefault; }
 
-        public void DefaultOpacityPercentage() {
-            WindowOpacityPercentage = WindowOpacityDefault;
-        }
+        public void DefaultOpacityPercentage() { WindowOpacityPercentage = WindowOpacityDefault; }
 
-        private void DefaultClickThrough() {
-            ClickThrough = ClickThroughDefault;
-        }
+        private void DefaultClickThrough() { ClickThrough = ClickThroughDefault; }
 
         public void RestoreDefault() {
             DefaultDateColor();

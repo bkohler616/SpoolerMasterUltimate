@@ -19,7 +19,7 @@
                     <GridViewColumn Header="Job ID" DisplayMemberBinding="{Binding JobId}" />
                     <GridViewColumn Header="Last Recorded Status" DisplayMemberBinding="{Binding Status}" />
                     <GridViewColumn Header="Highest Pages" DisplayMemberBinding="{Binding Pages}" />
-                    <GridViewColumn Header="Highest Size" DisplayMemberBinding="{Binding Size}"/>
+                    <GridViewColumn Header="Highest Size" DisplayMemberBinding="{Binding Size}" />
                     <GridViewColumn Header="Time Started" DisplayMemberBinding="{Binding TimeStarted}" />
                     <GridViewColumn Header="User" DisplayMemberBinding="{Binding User}" />
                     <GridViewColumn Header="Machine Name" DisplayMemberBinding="{Binding MachineName}" />

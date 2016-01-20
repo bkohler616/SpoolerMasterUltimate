@@ -10,17 +10,20 @@ using System.Windows;
 using PrintJobFlags = SpoolerMasterUltimate.PrinterStatusFlagInfo.PrintJobStatusFlags;
 using PrinterFlags = SpoolerMasterUltimate.PrinterStatusFlagInfo.PrinterStatusFlags;
 
-namespace SpoolerMasterUltimate {
-    internal class PrintJobManager {
+
+namespace SpoolerMasterUltimate
+{
+    internal class PrintJobManager
+    {
         private readonly HistoryViewWindow _historyView;
 
         /// <summary>
-        /// Initiallize these objects...
-        /// PritnerWindow
-        /// BlockedUserWindow
-        /// _historyView
-        /// CollectedHistory(list)
-        /// BlockedUsers(list)
+        ///     Initiallize these objects...
+        ///     PritnerWindow
+        ///     BlockedUserWindow
+        ///     _historyView
+        ///     CollectedHistory(list)
+        ///     BlockedUsers(list)
         /// </summary>
         public PrintJobManager() {
             PrinterWindow = new SelectPrinterWindow();
@@ -36,67 +39,59 @@ namespace SpoolerMasterUltimate {
         private BlockedUserViewWindow BlockedUserWindow { get; }
         private List<PrintJobData> CollectedHistory { get; }
         private List<PrintJobBlocker> BlockedUsers { get; }
-        private List<PrintJobData> CurrentPrintJobs { get; set; } 
+        private List<PrintJobData> CurrentPrintJobs { get; set; }
 
         public bool IsPrinterListCollected { private get; set; }
         private ManagementObjectCollection PrinterCollection { get; set; }
 
         /// <summary>
-        /// Get the collection of printers from installed printers.
-        /// A few methods utilize this to get information about the printer.
+        ///     Get the collection of printers from installed printers.
+        ///     A few methods utilize this to get information about the printer.
         /// </summary>
-        private void GetPrinterCollection()
-        {
+        private void GetPrinterCollection() {
             var logBuild = LogManager.LogSectionSeperator("Get Printer Attempt");
-            try
-            {
+            try {
                 var searchQuery = "SELECT * FROM Win32_Printer";
                 var searchPrinters = new ManagementObjectSearcher(searchQuery);
                 PrinterCollection = searchPrinters.Get();
                 IsPrinterListCollected = true;
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                 LogManager.AppendLog(logBuild + "\r\n" + LogManager.LogErrorSection +
                                      "\r\nCritical error when getting printer! " +
                                      ex.Message + "\r\n" + ex.InnerException + "\r\n" + ex.StackTrace);
             }
             LogManager.AppendLog(logBuild);
-            
-            
         }
 
         /// <summary>
-        /// Get the collection of printers from SetPrinterSearch, and give the name information to the PrinterWindow
+        ///     Get the collection of printers from SetPrinterSearch, and give the name information to the PrinterWindow
         /// </summary>
         public void GetNewPrinter() {
             var printerNameCollection = new StringCollection();
-            if (!IsPrinterListCollected)
-            {
+            if (!IsPrinterListCollected) {
                 GetPrinterCollection();
             }
             foreach (var o in PrinterCollection) {
                 var printer = (ManagementObject) o;
-                printerNameCollection.Add(printer.Properties["Name"].Value.ToString());
+                printerNameCollection.Add(printer.Properties ["Name"].Value.ToString());
             }
             PrinterWindow.GetNewPrinters(printerNameCollection);
         }
 
         /// <summary>
-        /// Check if the printer name is connectable.
+        ///     Check if the printer name is connectable.
         /// </summary>
         public void CheckPrinterConnection() {
             var logBuild = LogManager.LogSectionSeperator("Update Print Queue");
             try {
-                if (!IsPrinterListCollected)
-                {
+                if (!IsPrinterListCollected) {
                     GetPrinterCollection();
                 }
-                
-                foreach (var o in PrinterCollection)
-                {
+
+                foreach (var o in PrinterCollection) {
                     var printer = (ManagementObject) o;
-                    if (printer.Properties["Name"].Value.ToString() == PrinterWindow.PrinterSelection) {
+                    if (printer.Properties ["Name"].Value.ToString() == PrinterWindow.PrinterSelection) {
                         //MessageBox.Show(printer.Properties["Location"].Value.ToString());
                         IsPrinterConnected = true;
                     }
@@ -111,27 +106,25 @@ namespace SpoolerMasterUltimate {
         }
 
         /// <summary>
-        /// Retrive the printerStatus of the printer selected, if not selected, return "Not Connected"
+        ///     Retrive the printerStatus of the printer selected, if not selected, return "Not Connected"
         /// </summary>
         /// <returns> The printer status.</returns>
         public string CurrentPrinterStatus() {
             RemovedExhaustedPause();
-            if (!IsPrinterListCollected)
-            {
+            if (!IsPrinterListCollected) {
                 GetPrinterCollection();
             }
-            foreach (var o in PrinterCollection)
-            {
+            foreach (var o in PrinterCollection) {
                 var printer = (ManagementObject) o;
-                if (printer.Properties["Name"].Value.ToString() == PrinterWindow.PrinterSelection) 
-                    return GetCurrentStatus(printer.Properties["ExtendedPrinterStatus"].Value.ToString(), false);
+                if (printer.Properties ["Name"].Value.ToString() == PrinterWindow.PrinterSelection)
+                    return GetCurrentStatus(printer.Properties ["ExtendedPrinterStatus"].Value.ToString(), false);
             }
             return "Printer Not Connected";
         }
 
 
         /// <summary>
-        /// For every job in the list given, delete each and every one if possible.
+        ///     For every job in the list given, delete each and every one if possible.
         /// </summary>
         /// <param name="printData">A list of print job(s).</param>
         public void DeletePrintJobs(IList printData) {
@@ -140,9 +133,11 @@ namespace SpoolerMasterUltimate {
                 var searchQuery = "SELECT * FROM Win32_PrintJob";
                 var searchPrintJobs = new ManagementObjectSearcher(searchQuery);
                 var printJobCollection = searchPrintJobs.Get();
+
+                //Start deleting
                 foreach (var o in printJobCollection) {
                     var printJob = (ManagementObject) o;
-                    var jobId = printJob.Properties["JobId"].Value.ToString();
+                    var jobId = printJob.Properties ["JobId"].Value.ToString();
                     foreach (PrintJobData jobEdit in printData) {
                         if (jobEdit.JobId.ToString() == jobId) {
                             printJob.Delete();
@@ -160,7 +155,7 @@ namespace SpoolerMasterUltimate {
         }
 
         /// <summary>
-        /// For each job in the list, pause every one if possible.
+        ///     For each job in the list, pause every one if possible.
         /// </summary>
         /// <param name="printData">A list of print job(s)</param>
         public void PausePrintJobs(IList printData) {
@@ -169,50 +164,59 @@ namespace SpoolerMasterUltimate {
                 var searchQuery = "SELECT * FROM Win32_PrintJob";
                 var searchPrintJobs = new ManagementObjectSearcher(searchQuery);
                 var printJobCollection = searchPrintJobs.Get();
+
+                //Start pausing
                 foreach (var o in printJobCollection) {
                     var printJob = (ManagementObject) o;
-                    var jobId = printJob.Properties["JobId"].Value.ToString();
+                    var jobId = printJob.Properties ["JobId"].Value.ToString();
                     foreach (PrintJobData jobEdit in printData) {
                         if (jobEdit.JobId.ToString() == jobId) {
                             printJob.InvokeMethod(
-                                (Convert.ToUInt32(printJob.Properties["StatusMask"].Value.ToString()) & PrintJobFlags.Paused) != 0 ? "Resume" : "Pause", null);
+                                                  (Convert.ToUInt32(printJob.Properties ["StatusMask"].Value.ToString()) &
+                                                   PrintJobFlags.Paused) != 0
+                                                      ? "Resume"
+                                                      : "Pause", null);
                             logBuild += "\r\nPause/Resume event handled for " + jobEdit.JobId + " : " +
                                         jobEdit.MachineName;
-                            
                         }
                     }
                 }
             }
             catch (Exception ex) {
-                logBuild += ("Error on delete: " + ex.Message + "\r\n\r\n" + ex.StackTrace);
+                logBuild += "Error on delete: " + ex.Message + "\r\n\r\n" + ex.StackTrace;
             }
             LogManager.AppendLog(logBuild);
         }
 
-        public List<PrintJobData> GetPrintDataMultithreaded()
-        {
-            var logBuilder = LogManager.LogSectionSeperator("Get Print Data");
+        /// <summary>
+        ///     The multithreaded version of GetPrintData.
+        ///     Searches through Win32_PrintJob to create a collection of printJobs.
+        ///     Using the collection, dynamically create threads to take every job
+        ///     (in their own thread) to run ThreadedPrintJob([MangementObject]) with
+        ///     that threads given Win32_PrintJob ManagementObject.
+        /// </summary>
+        /// <returns>A list of PrintJobData to be used in a GridView.</returns>
+        public List<PrintJobData> GetPrintDataMultithreaded() {
+            var logBuilder = LogManager.LogSectionSeperator("Get Print Data [MT]");
             try {
                 var searchQuery = "SELECT * FROM Win32_PrintJob";
                 var searchPrintJobs = new ManagementObjectSearcher(searchQuery);
                 var printJobCollection = searchPrintJobs.Get();
                 CurrentPrintJobs = new List<PrintJobData>();
-                List<Task> printJobTasks = new List<Task>();
-                foreach (var o in printJobCollection)
-                {
+                var printJobTasks = new List<Task>();
+
+                //Start Threading.
+                foreach (var o in printJobCollection) {
                     var printJob = (ManagementObject) o;
-                    //Start Threading.
-                    printJobTasks.Add(Task.Factory.StartNew(() =>
-                    {
-                        ThreadedPrintJob(printJob);
-                    }));
+                    printJobTasks.Add(Task.Factory.StartNew(() => { ThreadedPrintJob(printJob); }));
                 }
                 Task.WaitAll(printJobTasks.ToArray());
                 LogManager.AppendLog(logBuilder);
                 return CurrentPrintJobs;
             }
             catch (Exception ex) {
-                MessageBox.Show("Critical error on updating printer information: " + ex.Message + "\r\n\r\n" + ex.StackTrace +
+                MessageBox.Show("Critical error on updating printer information: " + ex.Message + "\r\n\r\n" +
+                                ex.StackTrace +
                                 "\r\n\r\n" +
                                 ex.InnerException + "\r\n\r\nList of items: ");
             }
@@ -220,64 +224,62 @@ namespace SpoolerMasterUltimate {
             return new List<PrintJobData>();
         }
 
-        private void ThreadedPrintJob(ManagementObject printJob)
-        {
-            string logBuilder = "";
-            int pages = int.Parse(printJob.Properties["TotalPages"].Value.ToString());
-            var jobDataBuilder = new PrintJobData
-            {
-                JobId = int.Parse(printJob.Properties["JobId"].Value.ToString()),
-                Size = int.Parse(printJob.Properties["Size"].Value.ToString()),
-                Pages = pages == 0 ? 1 : pages,
-                //Status = GetCurrentStatus(printJob.Properties["StatusMask"].Value.ToString()),
-                Status = GetCurrentStatus(printJob.Properties["StatusMask"].Value.ToString(), true),
-                TimeStarted = printJob.Properties["TimeSubmitted"].Value.ToString(),
-                User = printJob.Properties["Owner"].Value.ToString(),
-                DocumentName = printJob.Properties["Document"].Value.ToString(),
-                MachineName = printJob.Properties["HostPrintQueue"].Value.ToString()
-            };
+        /// <summary>
+        ///     Method that can be used in a single thread.
+        ///     Based on the printJob given, build a PrintJobData object,
+        ///     run automations on the PrintJobData based on BlockedUsers and autoDelete.
+        ///     When finished automating, add it to a list of CurrentPrintJobs.
+        /// </summary>
+        /// <param name="printJob"> A managementObject of type Win32_PrintJob. </param>
+        private void ThreadedPrintJob(ManagementObject printJob) {
+            var logBuilder = "";
+            var pages = int.Parse(printJob.Properties ["TotalPages"].Value.ToString());
+            var jobDataBuilder = new PrintJobData {
+                                                      JobId = int.Parse(printJob.Properties ["JobId"].Value.ToString()),
+                                                      Size = int.Parse(printJob.Properties ["Size"].Value.ToString()),
+                                                      Pages = pages == 0 ? 1 : pages,
+                                                      Status = GetCurrentStatus(printJob.Properties ["StatusMask"].Value.ToString(), true),
+                                                      TimeStarted = printJob.Properties ["TimeSubmitted"].Value.ToString(),
+                                                      User = printJob.Properties ["Owner"].Value.ToString(),
+                                                      DocumentName = printJob.Properties ["Document"].Value.ToString(),
+                                                      MachineName = printJob.Properties ["HostPrintQueue"].Value.ToString()
+                                                  };
 
             var autoPause = CheckBlockedList(jobDataBuilder);
-            if (jobDataBuilder.Pages > PrinterWindow.DeletePrintLimit)
-            {
-                try
-                {
-                    printJob.Properties["StatusMask"].Value = (uint)printJob.Properties["StatusMask"].Value + PrintJobFlags.AutoDelete;
-                    jobDataBuilder.Status = GetCurrentStatus(
-                        printJob.Properties["StatusMask"].Value.ToString(), true);
+            if (jobDataBuilder.Pages > PrinterWindow.DeletePrintLimit) {
+                try {
+                    printJob.Properties ["StatusMask"].Value = (uint) printJob.Properties ["StatusMask"].Value + PrintJobFlags.AutoDelete;
+                    jobDataBuilder.Status = GetCurrentStatus(printJob.Properties ["StatusMask"].Value.ToString(), true);
                     printJob.Delete();
                     DeleteBlockedJob(jobDataBuilder);
                 }
-                catch (Exception ex)
-                {
-                    logBuilder += ("Error on auto delete for job " + jobDataBuilder.JobId + ": " + ex.Message +
-                                   "\r\n\r\n" + ex.StackTrace);
+                catch (Exception ex) {
+                    logBuilder += "Error on auto delete for job " + jobDataBuilder.JobId + ": " + ex.Message +
+                                  "\r\n\r\n" + ex.StackTrace;
                 }
             }
-            else if (autoPause || jobDataBuilder.Pages > PrinterWindow.PausePrintLimit)
-            {
-                try
-                {
+            else if (autoPause || jobDataBuilder.Pages > PrinterWindow.PausePrintLimit) {
+                try {
                     printJob.InvokeMethod("Pause", null);
                 }
-                catch (Exception ex)
-                {
-                    logBuilder += ("Error on auto pause for job " + jobDataBuilder.JobId + ": " + ex.Message +
-                                   "\r\n\r\n" + ex.StackTrace);
+                catch (Exception ex) {
+                    logBuilder += "Error on auto pause for job " + jobDataBuilder.JobId + ": " + ex.Message +
+                                  "\r\n\r\n" + ex.StackTrace;
                 }
             }
             logBuilder += "\r\n Job parsed: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName + " : " +
-                          (autoPause
-                              ? "Paused"
-                              : "Allowed");
+                          (autoPause ? "Paused" : "Allowed");
             LogManager.AppendLog(logBuilder);
+
             CheckPrintHistory(jobDataBuilder);
-            CurrentPrintJobs.Add(jobDataBuilder);
+            lock (CurrentPrintJobs)
+                CurrentPrintJobs.Add(jobDataBuilder);
         }
+
         /// <summary>
-        /// IN THE WORKS OF DEPRECATION
-        /// Collect every print job in the currently selected printer.
-        /// This has automation features for autopause and autodelete
+        ///     Deprecated.
+        ///     Collect every print job in the currently selected printer.
+        ///     This has automation features for autopause and autodelete
         /// </summary>
         /// <returns>A list of jobs in PrintJobData object format. To be used in a UI.</returns>
         public List<PrintJobData> GetPrintData() {
@@ -290,31 +292,29 @@ namespace SpoolerMasterUltimate {
                 foreach (var o in printJobCollection) {
                     //Start Threading.
                     var printJob = (ManagementObject) o;
-                    int pages = int.Parse(printJob.Properties["TotalPages"].Value.ToString());
+                    var pages = int.Parse(printJob.Properties ["TotalPages"].Value.ToString());
                     var jobDataBuilder = new PrintJobData {
-                        JobId = int.Parse(printJob.Properties["JobId"].Value.ToString()),
-                        Size = int.Parse(printJob.Properties["Size"].Value.ToString()),
-                        Pages = pages == 0 ? 1 : pages,
-                        //Status = GetCurrentStatus(printJob.Properties["StatusMask"].Value.ToString()),
-                        Status = GetCurrentStatus(printJob.Properties["StatusMask"].Value.ToString(), true),
-                        TimeStarted = printJob.Properties["TimeSubmitted"].Value.ToString(),
-                        User = printJob.Properties["Owner"].Value.ToString(),
-                        DocumentName = printJob.Properties["Document"].Value.ToString(),
-                        MachineName = printJob.Properties["HostPrintQueue"].Value.ToString()
-                    };
+                                                              JobId = int.Parse(printJob.Properties ["JobId"].Value.ToString()),
+                                                              Size = int.Parse(printJob.Properties ["Size"].Value.ToString()),
+                                                              Pages = pages == 0 ? 1 : pages,
+                                                              Status = GetCurrentStatus(printJob.Properties ["StatusMask"].Value.ToString(), true),
+                                                              TimeStarted = printJob.Properties ["TimeSubmitted"].Value.ToString(),
+                                                              User = printJob.Properties ["Owner"].Value.ToString(),
+                                                              DocumentName = printJob.Properties ["Document"].Value.ToString(),
+                                                              MachineName = printJob.Properties ["HostPrintQueue"].Value.ToString()
+                                                          };
 
                     var autoPause = CheckBlockedList(jobDataBuilder);
                     if (jobDataBuilder.Pages > PrinterWindow.DeletePrintLimit) {
                         try {
-                            printJob.Properties["StatusMask"].Value = (uint)printJob.Properties["StatusMask"].Value + PrintJobFlags.AutoDelete;
-                            jobDataBuilder.Status = GetCurrentStatus(
-                                printJob.Properties["StatusMask"].Value.ToString(), true);
+                            printJob.Properties ["StatusMask"].Value = (uint) printJob.Properties ["StatusMask"].Value + PrintJobFlags.AutoDelete;
+                            jobDataBuilder.Status = GetCurrentStatus(printJob.Properties ["StatusMask"].Value.ToString(), true);
                             printJob.Delete();
                             DeleteBlockedJob(jobDataBuilder);
                         }
                         catch (Exception ex) {
-                            logBuilder += ("Error on auto delete for job " + jobDataBuilder.JobId + ": " + ex.Message +
-                                           "\r\n\r\n" + ex.StackTrace);
+                            logBuilder += "Error on auto delete for job " + jobDataBuilder.JobId + ": " + ex.Message +
+                                          "\r\n\r\n" + ex.StackTrace;
                         }
                     }
                     else if (autoPause || jobDataBuilder.Pages > PrinterWindow.PausePrintLimit) {
@@ -322,14 +322,12 @@ namespace SpoolerMasterUltimate {
                             printJob.InvokeMethod("Pause", null);
                         }
                         catch (Exception ex) {
-                            logBuilder += ("Error on auto pause for job " + jobDataBuilder.JobId + ": " + ex.Message +
-                                           "\r\n\r\n" + ex.StackTrace);
+                            logBuilder += "Error on auto pause for job " + jobDataBuilder.JobId + ": " + ex.Message +
+                                          "\r\n\r\n" + ex.StackTrace;
                         }
                     }
                     logBuilder += "\r\n Job parsed: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName + " : " +
-                                  (autoPause
-                                      ? "Paused"
-                                      : "Allowed");
+                                  (autoPause ? "Paused" : "Allowed");
                     CheckPrintHistory(jobDataBuilder);
                     printJobs.Add(jobDataBuilder);
                 }
@@ -337,7 +335,8 @@ namespace SpoolerMasterUltimate {
                 return printJobs;
             }
             catch (Exception ex) {
-                MessageBox.Show("Critical error on updating printer information: " + ex.Message + "\r\n\r\n" + ex.StackTrace +
+                MessageBox.Show("Critical error on updating printer information: " + ex.Message + "\r\n\r\n" +
+                                ex.StackTrace +
                                 "\r\n\r\n" +
                                 ex.InnerException + "\r\n\r\nList of items: ");
             }
@@ -346,20 +345,22 @@ namespace SpoolerMasterUltimate {
         }
 
         /// <summary>
-        /// Search the history. If the job is new, add it to the list. If not, see if the old history is updateable.
+        ///     Search the history. If the job is new, add it to the list. If not, see if the old history is updateable.
         /// </summary>
         /// <param name="newJob">PrintJobData of the job that needs to be checked for history references.</param>
         private void CheckPrintHistory(PrintJobData newJob) {
-            var oldJobId = false;
-            foreach (var oldData in CollectedHistory.Where(oldData => oldData.JobId == newJob.JobId)) {
-                oldJobId = true;
-                oldData.CheckFilledData(newJob);
+            lock (CollectedHistory) {
+                var oldJobId = false;
+                foreach (var oldData in CollectedHistory.Where(oldData => oldData.JobId == newJob.JobId)) {
+                    oldJobId = true;
+                    oldData.CheckFilledData(newJob);
+                }
+                if (!oldJobId) CollectedHistory.Add(newJob);
             }
-            if (!oldJobId) CollectedHistory.Add(newJob);
         }
 
         /// <summary>
-        /// Search the block list. If the job is new, add it to the list. If not, update the user's current record.
+        ///     Search the block list. If the job is new, add it to the list. If not, update the user's current record.
         /// </summary>
         /// <param name="newJob">PrintJobData of the job that needs to be added to the block list.</param>
         /// <returns>A boolean if the job needs to be paused or not.</returns>
@@ -371,7 +372,7 @@ namespace SpoolerMasterUltimate {
             }
             if (!oldUserName) {
                 BlockedUsers.Add(new PrintJobBlocker(newJob, PrinterWindow.PauseComputerPrintTime,
-                    PrinterWindow.PausePrintLimit));
+                                                     PrinterWindow.PausePrintLimit));
             }
             foreach (var oldData in BlockedUsers) {
                 if (oldData.MachineName == newJob.MachineName)
@@ -381,18 +382,19 @@ namespace SpoolerMasterUltimate {
         }
 
         /// <summary>
-        /// Delete the selected job from the blocked users list. This removes that job's allocation. Keeps previous blocked allocation.
+        ///     Delete the selected job from the blocked users list. This removes that job's allocation. Keeps previous blocked
+        ///     allocation.
         /// </summary>
         /// <param name="deleteJob">PrintJobData that needs to be cleared from the list.</param>
         private void DeleteBlockedJob(PrintJobData deleteJob) {
             foreach (var data in BlockedUsers) {
-                if(data.MachineName == deleteJob.MachineName)
+                if (data.MachineName == deleteJob.MachineName)
                     data.DeleteJob(deleteJob);
             }
         }
 
         /// <summary>
-        /// Blocked users that have reached the time exauhstion will be deleted.
+        ///     Blocked users that have reached the time exauhstion will be deleted.
         /// </summary>
         private void RemovedExhaustedPause() {
             var tempStore = BlockedUsers.ToArray();
@@ -414,42 +416,38 @@ namespace SpoolerMasterUltimate {
         }
 
         /// <summary>
-        /// Pause the printer queue. This is not a hardware level pause, as the printer itself will
-        /// not report that it is paused, only the driver will.
+        ///     Pause the printer queue. This is not a hardware level pause, as the printer itself will
+        ///     not report that it is paused, only the driver will.
         /// </summary>
         public void PausePrinter() {
-            if (!IsPrinterListCollected)
-            {
+            if (!IsPrinterListCollected) {
                 GetPrinterCollection();
             }
-            foreach (var o in PrinterCollection)
-            {
+            foreach (var o in PrinterCollection) {
                 var printer = (ManagementObject) o;
-                if (printer.Properties["Name"].Value.ToString() == PrinterWindow.PrinterSelection) {
-                    printer.InvokeMethod(printer.Properties["ExtendedPrinterStatus"].Value.ToString() ==
-                        PrinterFlags.Paused.ToString()
-                            ? "Resume"
-                            : "Pause", null);
+                if (printer.Properties ["Name"].Value.ToString() == PrinterWindow.PrinterSelection) {
+                    printer.InvokeMethod(printer.Properties ["ExtendedPrinterStatus"].Value.ToString() ==
+                                         PrinterFlags.Paused.ToString()
+                                             ? "Resume"
+                                             : "Pause", null);
                 }
             }
         }
 
         /// <summary>
-        /// Display the history.
+        ///     Display the history.
         /// </summary>
-        public void ShowHistory() {
-            _historyView.ShowHistory(CollectedHistory);
-        }
+        public void ShowHistory() { _historyView.ShowHistory(CollectedHistory); }
 
         /// <summary>
-        /// Get the current status of the job or printer.
+        ///     Get the current status of the job or printer.
         /// </summary>
         /// <param name="numInfo">An unparsed string containing a uint according to what parameters the job/printer has.</param>
         /// <param name="printJobOrPrinter">True for print job, false for printer.</param>
         /// <returns></returns>
         private string GetCurrentStatus(string numInfo, bool printJobOrPrinter) {
             var status = uint.Parse(numInfo);
-            string statusBuilder = "";
+            var statusBuilder = "";
             if (printJobOrPrinter) {
                 if ((status & PrintJobFlags.Error) != 0) statusBuilder += "Error - ";
                 if ((status & PrintJobFlags.Restart) != 0) statusBuilder += "Restart - ";
@@ -509,19 +507,15 @@ namespace SpoolerMasterUltimate {
             }
             return statusBuilder;
         }
-    
-        /// <summary>
-        /// Display the blocked users window.
-        /// </summary>
-        public void ShowBlockedUsers() {
-            BlockedUserWindow.ShowBlockedUsers(BlockedUsers);
-        }
 
         /// <summary>
-        /// Clear the blocked users.
+        ///     Display the blocked users window.
         /// </summary>
-        public void PurgeBlockedUsers() {
-            BlockedUsers.Clear();
-        }
+        public void ShowBlockedUsers() { BlockedUserWindow.ShowBlockedUsers(BlockedUsers); }
+
+        /// <summary>
+        ///     Clear the blocked users.
+        /// </summary>
+        public void PurgeBlockedUsers() { BlockedUsers.Clear(); }
     }
 }

@@ -3,11 +3,14 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Navigation;
 
-namespace SpoolerMasterUltimate {
+
+namespace SpoolerMasterUltimate
+{
     /// <summary>
     ///     Interaction logic for About.xaml
     /// </summary>
-    public partial class About {
+    public partial class About
+    {
         public About() {
             InitializeComponent();
             Hide();
@@ -17,7 +20,8 @@ namespace SpoolerMasterUltimate {
             GithubLinkTimeOverlay.Text = "See the TimeOverlay base project on my github!";
             GithubLinkSpoolerMasterUltimate.Text = "See this SpoolerMasterUltimate project on my github!";
             ApplicationDesc.Text =
-                "This spooler project is for use on spooling printers! The project is licensed under the GNU GPL 2 License. Please only use this application and the source code as the license states.";
+                "This spooler project is for use on spooling printers! The project is licensed under the GNU GPL 2 License. "+ 
+                "Please only use this application and the source code as the license states.";
         }
 
         /// <summary>
@@ -26,9 +30,7 @@ namespace SpoolerMasterUltimate {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void GithubLinkTimeOverlay_OnRequestNavigate(object sender, RequestNavigateEventArgs e) {
-            Process.Start("http://github.com/riku12124/TimeOverlay");
-        }
+        private void GithubLinkTimeOverlay_OnRequestNavigate(object sender, RequestNavigateEventArgs e) { Process.Start("http://github.com/riku12124/TimeOverlay"); }
 
         /// <summary>
         ///     On GitHub Link Click
@@ -36,9 +38,7 @@ namespace SpoolerMasterUltimate {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void GithubLinkSpoolerMasterUltimate_OnRequestNavigate(object sender, RequestNavigateEventArgs e) {
-            Process.Start("http://github.com/riku12124/SpoolerMasterUltimate");
-        }
+        private void GithubLinkSpoolerMasterUltimate_OnRequestNavigate(object sender, RequestNavigateEventArgs e) { Process.Start("http://github.com/riku12124/SpoolerMasterUltimate"); }
 
         /// <summary>
         ///     On Window Closing Hide window.
@@ -55,8 +55,6 @@ namespace SpoolerMasterUltimate {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void BenWebsite_OnRequestNavigate(object sender, RequestNavigateEventArgs e) {
-            Process.Start("http://BenKohler.com");
-        }
+        private void BenWebsite_OnRequestNavigate(object sender, RequestNavigateEventArgs e) { Process.Start("http://BenKohler.com"); }
     }
 }

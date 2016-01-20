@@ -2,8 +2,11 @@
 using System.Linq;
 using System.Timers;
 
-namespace SpoolerMasterUltimate {
-    public class PrintJobBlocker {
+
+namespace SpoolerMasterUltimate
+{
+    public class PrintJobBlocker
+    {
         public PrintJobBlocker(PrintJobData printInfo, int setTime, int prntLimit) {
             MachineName = printInfo.MachineName;
             UserName = printInfo.User;
@@ -41,21 +44,22 @@ namespace SpoolerMasterUltimate {
         }
 
         public void UpdateBlocker(PrintJobData newPrintInfo) {
-            if (PreviousDocument.Any(pd => pd == newPrintInfo.JobId)) {
-                var index = PreviousDocument.IndexOf(newPrintInfo.JobId);
-                if (PreviousDocumentPageChange[index] < newPrintInfo.Pages) {
-                    PreviousDocumentPageChange[index] = newPrintInfo.Pages;
+            lock (PreviousDocument)
+                if (PreviousDocument.Any(pd => pd == newPrintInfo.JobId)) {
+                    var index = PreviousDocument.IndexOf(newPrintInfo.JobId);
+                    if (PreviousDocumentPageChange [index] < newPrintInfo.Pages) {
+                        PreviousDocumentPageChange [index] = newPrintInfo.Pages;
+                        PagesAllocated = PreviousDocumentPageChange.Sum();
+                        Paused = PagesAllocated > PrintLimit;
+                    }
+                }
+                else {
+                    TimeRemaining = TimeAlloted;
+                    PreviousDocument.Add(newPrintInfo.JobId);
+                    PreviousDocumentPageChange.Add(newPrintInfo.Pages);
                     PagesAllocated = PreviousDocumentPageChange.Sum();
                     Paused = PagesAllocated > PrintLimit;
                 }
-            }
-            else {
-                TimeRemaining = TimeAlloted;
-                PreviousDocument.Add(newPrintInfo.JobId);
-                PreviousDocumentPageChange.Add(newPrintInfo.Pages);
-                PagesAllocated = PreviousDocumentPageChange.Sum();
-                Paused = PagesAllocated > PrintLimit;
-            }
         }
 
         public void DeleteJob(PrintJobData jobToDelete) {

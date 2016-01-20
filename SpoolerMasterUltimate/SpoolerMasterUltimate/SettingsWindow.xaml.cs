@@ -6,11 +6,14 @@ using System.Windows;
 using System.Windows.Forms;
 using MessageBox = System.Windows.MessageBox;
 
-namespace SpoolerMasterUltimate {
+
+namespace SpoolerMasterUltimate
+{
     /// <summary>
     ///     Interaction logic for SettingsWindow.xaml
     /// </summary>
-    public partial class SettingsWindow {
+    public partial class SettingsWindow
+    {
         public NotifyIcon NIcon;
 
         public SettingsWindow() {
@@ -30,8 +33,8 @@ namespace SpoolerMasterUltimate {
             InitializeComponent();
             Settings = savedSettings;
             var nIcon = new NotifyIcon {
-                Icon = SystemIcons.Application
-            };
+                                           Icon = SystemIcons.Application
+                                       };
             nIcon.MouseClick += NIconOnTrayLeftMouseDown;
             nIcon.Visible = true;
             SetSettingsWindowContent();
@@ -49,9 +52,7 @@ namespace SpoolerMasterUltimate {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="routedEventArgs"></param>
-        private void NIconOnTrayLeftMouseDown(object sender, EventArgs routedEventArgs) {
-            Show();
-        }
+        private void NIconOnTrayLeftMouseDown(object sender, EventArgs routedEventArgs) { Show(); }
 
         /// <summary>
         ///     Set the content of the settings to the currently saved settings
@@ -239,9 +240,7 @@ namespace SpoolerMasterUltimate {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void CbWindowClickable_OnUnchecked(object sender, RoutedEventArgs e) {
-            TbBackgroundOpacity.Text = "0";
-        }
+        private void CbWindowClickable_OnUnchecked(object sender, RoutedEventArgs e) { TbBackgroundOpacity.Text = "0"; }
 
         /// <summary>
         ///     Window Clickable Check Box on Check
@@ -250,9 +249,7 @@ namespace SpoolerMasterUltimate {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void CbClickThrough_OnChecked(object sender, RoutedEventArgs e) {
-            TbBackgroundOpacity.Text = "50";
-        }
+        private void CbClickThrough_OnChecked(object sender, RoutedEventArgs e) { TbBackgroundOpacity.Text = "50"; }
 
         /// <summary>
         ///     Apply button On Click
@@ -260,8 +257,6 @@ namespace SpoolerMasterUltimate {
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Apply_OnClick(object sender, RoutedEventArgs e) {
-            SetSettings();
-        }
+        private void Apply_OnClick(object sender, RoutedEventArgs e) { SetSettings(); }
     }
 }

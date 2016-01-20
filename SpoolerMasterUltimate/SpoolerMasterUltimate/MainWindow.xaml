@@ -76,7 +76,7 @@
                     <Button Content="Purge Blocked Users"
                             Click="PurgeBlockedUsers_OnClick"
                             Margin="5,5,5,5"
-                            Width="130"/>
+                            Width="130" />
                     <Button Content="View Blocked Users"
                             Click="ViewBlockedUsers_OnClick"
                             Margin="5,5,5,5"
