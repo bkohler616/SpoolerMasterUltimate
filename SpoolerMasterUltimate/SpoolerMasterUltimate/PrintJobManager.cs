@@ -111,6 +111,8 @@ namespace SpoolerMasterUltimate
         /// <returns> The printer status.</returns>
         public string CurrentPrinterStatus() {
             RemovedExhaustedPause();
+
+            BlockedUserWindow.BlockedUsers = BlockedUsers;
             if (!IsPrinterListCollected) {
                 GetPrinterCollection();
             }
@@ -414,6 +416,7 @@ namespace SpoolerMasterUltimate
                     BlockedUsers.Remove(blockedUser);
             }
             tempStore = BlockedUsers.ToArray();
+            BlockedUserWindow.RefreshUsers();
             var tempStoreBlockCancels = BlockedUserWindow.BlockedUsers.ToArray();
             if (!BlockedUserWindow.RemoveBlocked) return;
             foreach (var blockedUser in tempStore) {
