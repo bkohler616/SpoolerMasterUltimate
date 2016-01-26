@@ -257,104 +257,40 @@ namespace SpoolerMasterUltimate
             var year = jobDataBuilder.TimeStarted.Substring(0, 4);
             jobDataBuilder.TimeStarted = hour + ":" + min + ":" + sec + " " + (isPm ? "PM" : "AM") + " - (" + mon + "/" + day + "/" + year + ")";
 
-            //Check for autoPause
-            var autoPause = CheckBlockedList(jobDataBuilder);
-            if (jobDataBuilder.Pages > PrinterWindow.DeletePrintLimit) {
+            
+            var userAllocatedPages = CheckBlockedList(jobDataBuilder);
+            //Check for autoDelete.
+            if (jobDataBuilder.Pages > PrinterWindow.DeletePrintLimit || userAllocatedPages > PrinterWindow.DeletePrintLimit) {
                 try {
                     printJob.Properties ["StatusMask"].Value = (uint) printJob.Properties ["StatusMask"].Value + PrintJobFlags.AutoDelete;
                     jobDataBuilder.Status = GetCurrentStatus(printJob.Properties ["StatusMask"].Value.ToString(), true);
                     printJob.Delete();
                     DeleteBlockedJob(jobDataBuilder);
+                    logBuilder += "\r\n   Job deleted: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName;
                 }
                 catch (Exception ex) {
-                    logBuilder += "Error on auto delete for job " + jobDataBuilder.JobId + ": " + ex.Message +
+                    logBuilder += "\r\nError on auto delete for job " + jobDataBuilder.JobId + ": " + ex.Message +
                                   "\r\n\r\n" + ex.StackTrace;
                 }
             }
-            else if (autoPause || jobDataBuilder.Pages > PrinterWindow.PausePrintLimit) {
+            //Check for autoPause.
+            else if (jobDataBuilder.Pages > PrinterWindow.PausePrintLimit || userAllocatedPages > PrinterWindow.PausePrintLimit) {
                 try {
                     printJob.InvokeMethod("Pause", null);
+                    printJob.Properties["StatusMask"].Value = (uint)printJob.Properties["StatusMask"].Value + PrintJobFlags.AutoPause;
+                    logBuilder += "\r\n   Job paused: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName;
                 }
                 catch (Exception ex) {
-                    logBuilder += "Error on auto pause for job " + jobDataBuilder.JobId + ": " + ex.Message +
+                    logBuilder += "\r\nError on auto pause for job " + jobDataBuilder.JobId + ": " + ex.Message +
                                   "\r\n\r\n" + ex.StackTrace;
                 }
             }
-            logBuilder += "\r\n Job parsed: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName + " : " +
-                          (autoPause ? "Paused" : "Allowed");
+            logBuilder += "\r\n Job allowed: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName;
             LogManager.AppendLog(logBuilder);
 
             CheckPrintHistory(jobDataBuilder);
             lock (CurrentPrintJobs)
                 CurrentPrintJobs.Add(jobDataBuilder);
-        }
-
-        /// <summary>
-        ///     Deprecated.
-        ///     Collect every print job in the currently selected printer.
-        ///     This has automation features for autopause and autodelete
-        /// </summary>
-        /// <returns>A list of jobs in PrintJobData object format. To be used in a UI.</returns>
-        public List<PrintJobData> GetPrintData() {
-            var logBuilder = LogManager.LogSectionSeperator("Get Print Data");
-            try {
-                var searchQuery = "SELECT * FROM Win32_PrintJob";
-                var searchPrintJobs = new ManagementObjectSearcher(searchQuery);
-                var printJobCollection = searchPrintJobs.Get();
-                var printJobs = new List<PrintJobData>();
-                foreach (var o in printJobCollection) {
-                    //Start Threading.
-                    var printJob = (ManagementObject) o;
-                    var pages = int.Parse(printJob.Properties ["TotalPages"].Value.ToString());
-                    var jobDataBuilder = new PrintJobData {
-                                                              JobId = int.Parse(printJob.Properties ["JobId"].Value.ToString()),
-                                                              Size = int.Parse(printJob.Properties ["Size"].Value.ToString()),
-                                                              Pages = pages == 0 ? 1 : pages,
-                                                              Status = GetCurrentStatus(printJob.Properties ["StatusMask"].Value.ToString(), true),
-                                                              TimeStarted = printJob.Properties ["TimeSubmitted"].Value.ToString(),
-                                                              User = printJob.Properties ["Owner"].Value.ToString(),
-                                                              DocumentName = printJob.Properties ["Document"].Value.ToString(),
-                                                              MachineName = printJob.Properties ["HostPrintQueue"].Value.ToString()
-                                                          };
-                    
-                    var autoPause = CheckBlockedList(jobDataBuilder);
-                    if (jobDataBuilder.Pages > PrinterWindow.DeletePrintLimit) {
-                        try {
-                            printJob.Properties ["StatusMask"].Value = (uint) printJob.Properties ["StatusMask"].Value + PrintJobFlags.AutoDelete;
-                            jobDataBuilder.Status = GetCurrentStatus(printJob.Properties ["StatusMask"].Value.ToString(), true);
-                            printJob.Delete();
-                            DeleteBlockedJob(jobDataBuilder);
-                        }
-                        catch (Exception ex) {
-                            logBuilder += "Error on auto delete for job " + jobDataBuilder.JobId + ": " + ex.Message +
-                                          "\r\n\r\n" + ex.StackTrace;
-                        }
-                    }
-                    else if (autoPause || jobDataBuilder.Pages > PrinterWindow.PausePrintLimit) {
-                        try {
-                            printJob.InvokeMethod("Pause", null);
-                        }
-                        catch (Exception ex) {
-                            logBuilder += "Error on auto pause for job " + jobDataBuilder.JobId + ": " + ex.Message +
-                                          "\r\n\r\n" + ex.StackTrace;
-                        }
-                    }
-                    logBuilder += "\r\n Job parsed: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName + " : " +
-                                  (autoPause ? "Paused" : "Allowed");
-                    CheckPrintHistory(jobDataBuilder);
-                    printJobs.Add(jobDataBuilder);
-                }
-                LogManager.AppendLog(logBuilder);
-                return printJobs;
-            }
-            catch (Exception ex) {
-                MessageBox.Show("Critical error on updating printer information: " + ex.Message + "\r\n\r\n" +
-                                ex.StackTrace +
-                                "\r\n\r\n" +
-                                ex.InnerException + "\r\n\r\nList of items: ");
-            }
-            LogManager.AppendLog(logBuilder);
-            return new List<PrintJobData>();
         }
 
         /// <summary>
@@ -377,7 +313,7 @@ namespace SpoolerMasterUltimate
         /// </summary>
         /// <param name="newJob">PrintJobData of the job that needs to be added to the block list.</param>
         /// <returns>A boolean if the job needs to be paused or not.</returns>
-        private bool CheckBlockedList(PrintJobData newJob) {
+        private int CheckBlockedList(PrintJobData newJob) {
             var oldUserName = false;
             foreach (var oldData in BlockedUsers.Where(oldData => (oldData.MachineName == newJob.MachineName) && (oldData.UserName == newJob.User))) {
                 oldUserName = true;
@@ -389,9 +325,9 @@ namespace SpoolerMasterUltimate
             }
             foreach (var oldData in BlockedUsers) {
                 if ((oldData.MachineName == newJob.MachineName) && (oldData.UserName == newJob.User))
-                    return oldData.Paused;
+                    return oldData.PagesAllocated;
             }
-            return false;
+            return -1;
         }
 
         /// <summary>
@@ -475,6 +411,7 @@ namespace SpoolerMasterUltimate
                 if ((status & PrintJobFlags.Spooling) != 0) statusBuilder += "Spooling - ";
                 if ((status & PrintJobFlags.Deleting) != 0) statusBuilder += "Deleting - ";
                 if ((status & PrintJobFlags.Paused) != 0) statusBuilder += "Paused - ";
+                if ((status & PrintJobFlags.AutoPause) != 0) statusBuilder += "Auto Paused - ";
                 if ((status & PrintJobFlags.AutoDelete) != 0) statusBuilder += "Auto Deleted";
             }
             else {
