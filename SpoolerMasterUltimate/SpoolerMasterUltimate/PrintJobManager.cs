@@ -366,7 +366,7 @@ namespace SpoolerMasterUltimate
         /// <returns>A boolean if the job needs to be paused or not.</returns>
         private bool CheckBlockedList(PrintJobData newJob) {
             var oldUserName = false;
-            foreach (var oldData in BlockedUsers.Where(oldData => oldData.MachineName == newJob.MachineName)) {
+            foreach (var oldData in BlockedUsers.Where(oldData => (oldData.MachineName == newJob.MachineName) && (oldData.UserName == newJob.User))) {
                 oldUserName = true;
                 oldData.UpdateBlocker(newJob);
             }
@@ -375,7 +375,7 @@ namespace SpoolerMasterUltimate
                                                      PrinterWindow.PausePrintLimit));
             }
             foreach (var oldData in BlockedUsers) {
-                if (oldData.MachineName == newJob.MachineName)
+                if ((oldData.MachineName == newJob.MachineName) && (oldData.UserName == newJob.User))
                     return oldData.Paused;
             }
             return false;
