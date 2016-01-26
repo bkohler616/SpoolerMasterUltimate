@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Timers;
 using System.Windows;
 using System.Windows.Data;
 
@@ -12,13 +13,15 @@ namespace SpoolerMasterUltimate
     /// </summary>
     public partial class BlockedUserViewWindow : Window
     {
+
         public BlockedUserViewWindow() {
             InitializeComponent();
             BlockedUsers = new List<PrintJobBlocker>();
         }
 
+
         public bool RemoveBlocked { get; set; }
-        public List<PrintJobBlocker> BlockedUsers { get; private set; }
+        public List<PrintJobBlocker> BlockedUsers { get; set; }
 
         public void ShowBlockedUsers(List<PrintJobBlocker> newBlockedUsers) {
             Visibility = Visibility.Visible;
@@ -41,6 +44,10 @@ namespace SpoolerMasterUltimate
         private void BlockedUserViewWindow_OnClosing(object sender, CancelEventArgs e) {
             e.Cancel = true;
             Visibility = Visibility.Hidden;
+        }
+
+        public void RefreshUsers() {
+            LvBlockedUsers.Items.Refresh();
         }
     }
 }
