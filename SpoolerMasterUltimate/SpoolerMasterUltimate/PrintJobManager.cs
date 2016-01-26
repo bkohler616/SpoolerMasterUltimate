@@ -244,7 +244,18 @@ namespace SpoolerMasterUltimate
                                                       DocumentName = printJob.Properties ["Document"].Value.ToString(),
                                                       MachineName = printJob.Properties ["HostPrintQueue"].Value.ToString()
                                                   };
+            //Set the proper time to a legible fasion.
+            var hour = Convert.ToInt32(jobDataBuilder.TimeStarted.Substring(8, 2));
+            var isPm = hour%13 < hour;
+            hour = isPm ? (hour%13) + 1 : hour;
+            var min = jobDataBuilder.TimeStarted.Substring(10, 2);
+            var sec = jobDataBuilder.TimeStarted.Substring(12, 2);
+            var day = jobDataBuilder.TimeStarted.Substring(6, 2);
+            var mon = jobDataBuilder.TimeStarted.Substring(4, 2);
+            var year = jobDataBuilder.TimeStarted.Substring(0, 4);
+            jobDataBuilder.TimeStarted = hour + ":" + min + ":" + sec + " " + (isPm ? "PM" : "AM") + " - (" + mon + "/" + day + "/" + year + ")";
 
+            //Check for autoPause
             var autoPause = CheckBlockedList(jobDataBuilder);
             if (jobDataBuilder.Pages > PrinterWindow.DeletePrintLimit) {
                 try {
@@ -303,7 +314,7 @@ namespace SpoolerMasterUltimate
                                                               DocumentName = printJob.Properties ["Document"].Value.ToString(),
                                                               MachineName = printJob.Properties ["HostPrintQueue"].Value.ToString()
                                                           };
-
+                    
                     var autoPause = CheckBlockedList(jobDataBuilder);
                     if (jobDataBuilder.Pages > PrinterWindow.DeletePrintLimit) {
                         try {
