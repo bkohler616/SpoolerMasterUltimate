@@ -249,7 +249,7 @@ namespace SpoolerMasterUltimate
             //Set the proper time to a legible fasion.
             var hour = Convert.ToInt32(jobDataBuilder.TimeStarted.Substring(8, 2));
             var isPm = hour%13 < hour;
-            hour = isPm ? (hour%13) + 1 : hour;
+            hour = isPm ? hour%13 + 1 : hour;
             var min = jobDataBuilder.TimeStarted.Substring(10, 2);
             var sec = jobDataBuilder.TimeStarted.Substring(12, 2);
             var day = jobDataBuilder.TimeStarted.Substring(6, 2);
@@ -257,7 +257,7 @@ namespace SpoolerMasterUltimate
             var year = jobDataBuilder.TimeStarted.Substring(0, 4);
             jobDataBuilder.TimeStarted = hour + ":" + min + ":" + sec + " " + (isPm ? "PM" : "AM") + " - (" + mon + "/" + day + "/" + year + ")";
 
-            
+
             var userAllocatedPages = CheckBlockedList(jobDataBuilder);
             //Check for autoDelete.
             if (jobDataBuilder.Pages > PrinterWindow.DeletePrintLimit || userAllocatedPages > PrinterWindow.DeletePrintLimit) {
@@ -277,7 +277,8 @@ namespace SpoolerMasterUltimate
             else if (jobDataBuilder.Pages > PrinterWindow.PausePrintLimit || userAllocatedPages > PrinterWindow.PausePrintLimit) {
                 try {
                     printJob.InvokeMethod("Pause", null);
-                    printJob.Properties["StatusMask"].Value = (uint)printJob.Properties["StatusMask"].Value + PrintJobFlags.AutoPause;
+                    printJob.Properties ["StatusMask"].Value = (uint) printJob.Properties ["StatusMask"].Value + PrintJobFlags.AutoPause - PrintJobFlags.Paused;
+                    jobDataBuilder.Status = GetCurrentStatus(printJob.Properties["StatusMask"].Value.ToString(), true);
                     logBuilder += "\r\n   Job paused: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName;
                 }
                 catch (Exception ex) {
