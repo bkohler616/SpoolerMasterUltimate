@@ -274,6 +274,8 @@ namespace SpoolerMasterUltimate
             else if (autoPause || jobDataBuilder.Pages > PrinterWindow.PausePrintLimit) {
                 try {
                     printJob.InvokeMethod("Pause", null);
+                    printJob.Properties ["StatusMask"].Value = (uint) printJob.Properties ["StatusMask"].Value + PrintJobFlags.AutoPause;
+                    jobDataBuilder.Status = GetCurrentStatus(printJob.Properties["StatusMask"].Value.ToString(), true);
                 }
                 catch (Exception ex) {
                     logBuilder += "Error on auto pause for job " + jobDataBuilder.JobId + ": " + ex.Message +
@@ -475,6 +477,7 @@ namespace SpoolerMasterUltimate
                 if ((status & PrintJobFlags.Spooling) != 0) statusBuilder += "Spooling - ";
                 if ((status & PrintJobFlags.Deleting) != 0) statusBuilder += "Deleting - ";
                 if ((status & PrintJobFlags.Paused) != 0) statusBuilder += "Paused - ";
+                if ((status & PrintJobFlags.AutoPause) != 0) statusBuilder += "AutoPaused - ";
                 if ((status & PrintJobFlags.AutoDelete) != 0) statusBuilder += "Auto Deleted";
             }
             else {
