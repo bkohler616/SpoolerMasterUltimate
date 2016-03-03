@@ -242,6 +242,7 @@ namespace SpoolerMasterUltimate
                                                       Pages = pages == 0 ? 1 : pages,
                                                       Status = GetCurrentStatus(printJob.Properties ["StatusMask"].Value.ToString(), true),
                                                       TimeStarted = printJob.Properties ["TimeSubmitted"].Value.ToString(),
+                                                      SortingTime = printJob.Properties["TimeSubmitted"].Value.ToString(),
                                                       User = printJob.Properties ["Owner"].Value.ToString(),
                                                       DocumentName = printJob.Properties ["Document"].Value.ToString(),
                                                       MachineName = printJob.Properties ["HostPrintQueue"].Value.ToString()
@@ -255,6 +256,7 @@ namespace SpoolerMasterUltimate
             var day = jobDataBuilder.TimeStarted.Substring(6, 2);
             var mon = jobDataBuilder.TimeStarted.Substring(4, 2);
             var year = jobDataBuilder.TimeStarted.Substring(0, 4);
+
             jobDataBuilder.TimeStarted = hour + ":" + min + ":" + sec + " " + (isPm ? "PM" : "AM") + " - (" + mon + "/" + day + "/" + year + ")";
 
 
@@ -266,10 +268,11 @@ namespace SpoolerMasterUltimate
                     jobDataBuilder.Status = GetCurrentStatus(printJob.Properties ["StatusMask"].Value.ToString(), true);
                     printJob.Delete();
                     DeleteBlockedJob(jobDataBuilder);
-                    logBuilder += "\r\n   Job deleted: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName;
+                    logBuilder += "\r\n         Job deleted: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName;
                 }
                 catch (Exception ex) {
-                    logBuilder += "\r\nError on auto delete for job " + jobDataBuilder.JobId + ": " + ex.Message +
+                    logBuilder += LogManager.LogErrorSection +
+                         "\r\nError on auto delete for job " + jobDataBuilder.JobId + ": " + ex.Message +
                                   "\r\n\r\n" + ex.StackTrace;
                 }
             }
@@ -279,14 +282,15 @@ namespace SpoolerMasterUltimate
                     printJob.InvokeMethod("Pause", null);
                     printJob.Properties ["StatusMask"].Value = (uint) printJob.Properties ["StatusMask"].Value + PrintJobFlags.AutoPause - PrintJobFlags.Paused;
                     jobDataBuilder.Status = GetCurrentStatus(printJob.Properties["StatusMask"].Value.ToString(), true);
-                    logBuilder += "\r\n   Job paused: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName;
+                    logBuilder += "\r\n         Job paused: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName;
                 }
                 catch (Exception ex) {
-                    logBuilder += "\r\nError on auto pause for job " + jobDataBuilder.JobId + ": " + ex.Message +
+                    logBuilder += LogManager.LogErrorSection + 
+                        "\r\nError on auto pause for job " + jobDataBuilder.JobId + ": " + ex.Message +
                                   "\r\n\r\n" + ex.StackTrace;
                 }
-            }
-            logBuilder += "\r\n Job allowed: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName;
+            } else
+                logBuilder += "\r\n         Job allowed: " + jobDataBuilder.JobId + " : " + jobDataBuilder.MachineName;
             LogManager.AppendLog(logBuilder);
 
             CheckPrintHistory(jobDataBuilder);
@@ -315,6 +319,7 @@ namespace SpoolerMasterUltimate
         /// <param name="newJob">PrintJobData of the job that needs to be added to the block list.</param>
         /// <returns>A boolean if the job needs to be paused or not.</returns>
         private int CheckBlockedList(PrintJobData newJob) {
+
             var oldUserName = false;
             foreach (var oldData in BlockedUsers.Where(oldData => (oldData.MachineName == newJob.MachineName) && (oldData.UserName == newJob.User))) {
                 oldUserName = true;

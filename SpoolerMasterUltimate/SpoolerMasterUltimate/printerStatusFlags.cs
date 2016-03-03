@@ -17,7 +17,7 @@
             public const uint UserInterventionReq = 0x400;
             public const uint Restart = 0x800;
             public const uint AutoPause = 0x1000;
-            public const uint AutoDelete = 0x2000;
+            public const uint AutoDelete = 0x4000;
 
         }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 
@@ -15,15 +16,9 @@ namespace SpoolerMasterUltimate
         public HistoryViewWindow() { InitializeComponent(); }
 
         public void ShowHistory(List<PrintJobData> printInformation) {
+            var tempInfo = printInformation.OrderByDescending(c => c.SortingTime);
             Visibility = Visibility.Visible;
-            LvPrintHistory.ItemsSource = printInformation;
-            try {
-                var view = (CollectionView) CollectionViewSource.GetDefaultView(LvPrintHistory.ItemsSource);
-                view.SortDescriptions.Add(new SortDescription("TimeStarted", ListSortDirection.Descending));
-            }
-            catch (NullReferenceException) {
-                LogManager.AppendLog(LogManager.LogErrorSection + "\nNo history to sort.");
-            }
+            LvPrintHistory.ItemsSource = tempInfo;
         }
 
         private void HistoryViewWindow_OnClosing(object sender, CancelEventArgs e) {

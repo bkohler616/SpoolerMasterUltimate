@@ -17,6 +17,7 @@
         public string TimeStarted { get; set; }
         public string MachineName { get; set; }
         public string DocumentName { get; set; }
+        public string SortingTime { get; set; }
 
         public void CheckFilledData(PrintJobData newData) {
             if (TimeStarted != newData.TimeStarted) {
@@ -28,6 +29,7 @@
                 DocumentName = newData.DocumentName;
                 TimeElapsed = newData.TimeElapsed;
                 TimeStarted = newData.TimeStarted;
+                SortingTime = newData.SortingTime;
             }
             else {
                 if (newData.Pages > Pages)
