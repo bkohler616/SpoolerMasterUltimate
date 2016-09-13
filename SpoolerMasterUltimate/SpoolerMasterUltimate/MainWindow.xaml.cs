@@ -26,12 +26,13 @@ namespace SpoolerMasterUltimate
         private readonly Timer _updateTime;
         private DateTime _currentDateTime;
         private int _selectedJob;
+        private bool isPrintManaging = false;
 
         public MainWindow() {
             InitializeComponent();
             LogManager.SetupLog();
             _updateTime = new Timer {
-                                        Interval = 500
+                                        Interval = 1500
                                     };
             _currentDateTime = new DateTime();
             _aboutWindow = new About();
@@ -67,7 +68,8 @@ namespace SpoolerMasterUltimate
             _updateTime.Stop();
             _currentDateTime = DateTime.Now;
             //Invoke another thread to input content
-            Application.Current.Dispatcher.BeginInvoke((Action) delegate {
+            if (!isPrintManaging)
+                Application.Current.Dispatcher.BeginInvoke((Action) delegate {
                                                                     SettingsUpdate();
                                                                     PrinterUpdate();
                                                                 });
@@ -97,6 +99,7 @@ namespace SpoolerMasterUltimate
         ///     (lblPrinterStatus, lvPrintMonitor, and _printManager)
         /// </summary>
         private void PrinterUpdate() {
+            isPrintManaging = true;
             _printManager.IsPrinterListCollected = false;
             if (_printManager.PrinterWindow.PrinterGet) {
                 _printManager.PrinterWindow.PrinterGet = false;
@@ -107,6 +110,7 @@ namespace SpoolerMasterUltimate
             else if (_printManager.IsPrinterConnected) SetPrintStatus();
             LblPrinterStatus.Content = _printManager.CurrentPrinterStatus();
             LvPrintMonitor.SelectedIndex = _selectedJob;
+            isPrintManaging = false;
         }
 
         /// <summary>

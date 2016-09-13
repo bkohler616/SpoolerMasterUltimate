@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ namespace SpoolerMasterUltimate
     internal class PrintJobManager
     {
         private readonly HistoryViewWindow _historyView;
+        private Stopwatch timerStopwatch;
 
         /// <summary>
         ///     Initiallize these objects...
@@ -27,7 +29,7 @@ namespace SpoolerMasterUltimate
         /// </summary>
         public PrintJobManager() {
             PrinterWindow = new SelectPrinterWindow();
-            GetNewPrinter();
+            timerStopwatch = new Stopwatch();
             _historyView = new HistoryViewWindow();
             BlockedUserWindow = new BlockedUserViewWindow();
             CollectedHistory = new List<PrintJobData>();
@@ -49,6 +51,9 @@ namespace SpoolerMasterUltimate
         ///     A few methods utilize this to get information about the printer.
         /// </summary>
         private void GetPrinterCollection() {
+            timerStopwatch = new Stopwatch();
+            Debug.WriteLine("GetPrinterCollection start");
+            timerStopwatch.Start();
             var logBuild = LogManager.LogSectionSeperator("Get Printer Attempt");
             try {
                 var searchQuery = "SELECT * FROM Win32_Printer";
@@ -62,12 +67,17 @@ namespace SpoolerMasterUltimate
                                      ex.Message + "\r\n" + ex.InnerException + "\r\n" + ex.StackTrace);
             }
             LogManager.AppendLog(logBuild);
+            timerStopwatch.Stop();
+            Debug.WriteLine("Time: " + timerStopwatch.Elapsed);
+            timerStopwatch.Reset();
         }
 
         /// <summary>
         ///     Get the collection of printers from SetPrinterSearch, and give the name information to the PrinterWindow
         /// </summary>
         public void GetNewPrinter() {
+            Debug.WriteLine("GetNewPrinter start");
+            timerStopwatch.Start();
             var printerNameCollection = new StringCollection();
             if (!IsPrinterListCollected) {
                 GetPrinterCollection();
@@ -77,6 +87,9 @@ namespace SpoolerMasterUltimate
                 printerNameCollection.Add(printer.Properties ["Name"].Value.ToString());
             }
             PrinterWindow.GetNewPrinters(printerNameCollection);
+            timerStopwatch.Stop();
+            Debug.WriteLine("Time: " + timerStopwatch.Elapsed);
+            timerStopwatch.Reset();
         }
 
         /// <summary>
@@ -200,6 +213,8 @@ namespace SpoolerMasterUltimate
         /// <returns>A list of PrintJobData to be used in a GridView.</returns>
         public List<PrintJobData> GetPrintDataMultithreaded() {
             var logBuilder = LogManager.LogSectionSeperator("Get Print Data [MT]");
+            Debug.WriteLine("Start print data multithreaded");
+            timerStopwatch.Start();
             try {
                 var searchQuery = "SELECT * FROM Win32_PrintJob";
                 var searchPrintJobs = new ManagementObjectSearcher(searchQuery);
@@ -214,6 +229,9 @@ namespace SpoolerMasterUltimate
                 }
                 Task.WaitAll(printJobTasks.ToArray());
                 LogManager.AppendLog(logBuilder);
+                timerStopwatch.Stop();
+                Debug.WriteLine("Time for Mult: " + timerStopwatch.Elapsed);
+                timerStopwatch.Reset();
                 return CurrentPrintJobs;
             }
             catch (Exception ex) {
