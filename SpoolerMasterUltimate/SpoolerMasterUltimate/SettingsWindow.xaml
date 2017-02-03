@@ -125,6 +125,18 @@
                   Unchecked="CbWindowClickable_OnUnchecked"
                   Checked="CbClickThrough_OnChecked" />
 
+        <Label Content="Interval Update Rate: Ms"
+               Grid.Column="3"
+               Grid.Row="0"
+               HorizontalAlignment="Right"/>
+        <TextBox Name="TbInternalUpdate"
+                 Grid.Column="4"
+                 Grid.Row="0"
+                 Width="60"
+                 Height="25"
+                 HorizontalAlignment="Left"
+                 Margin="5,5,5,5"
+                 MaxLength="4"/>
         <Button Grid.Column="3"
                 Grid.Row="7"
                 Margin="5,5,5,5"

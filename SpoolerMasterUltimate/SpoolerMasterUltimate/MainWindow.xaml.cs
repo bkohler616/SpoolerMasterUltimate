@@ -23,10 +23,10 @@ namespace SpoolerMasterUltimate
         private readonly About _aboutWindow;
         private readonly PrintJobManager _printManager;
         private readonly SettingsWindow _settingsWindowAccess;
-        private readonly Timer _updateTime;
         private DateTime _currentDateTime;
         private int _selectedJob;
-        private bool isPrintManaging = false;
+        private readonly Timer _updateTime;
+        private bool _isPrintManaging;
 
         public MainWindow() {
             InitializeComponent();
@@ -44,7 +44,7 @@ namespace SpoolerMasterUltimate
 
             //If settings save exists, deserialize it to SettingsWindow
             if (File.Exists(_path)) {
-                var reader = new XmlSerializer(typeof (SettingsInfo));
+                var reader = new XmlSerializer(typeof(SettingsInfo));
                 var file = new StreamReader(_path);
                 _settingsWindowAccess = new SettingsWindow((SettingsInfo) reader.Deserialize(file));
             }
@@ -68,11 +68,17 @@ namespace SpoolerMasterUltimate
             _updateTime.Stop();
             _currentDateTime = DateTime.Now;
             //Invoke another thread to input content
-            if (!isPrintManaging)
+            if (!_isPrintManaging)
                 Application.Current.Dispatcher.BeginInvoke((Action) delegate {
-                                                                    SettingsUpdate();
-                                                                    PrinterUpdate();
-                                                                });
+                                                                        LblDate.Content = _currentDateTime.DayOfWeek + ", " + DateTime.Now.ToString("MMMM") + " (" +
+                                                                                          _currentDateTime.Month +
+                                                                                          "/" + _currentDateTime.Day + "/" +
+                                                                                          _currentDateTime.Year + ")";
+                                                                        LblTime.Content = _currentDateTime.ToString("hh:mm:ss tt");
+                                                                        if (_settingsWindowAccess.Settings.IsChangeMade)
+                                                                            SettingsUpdate();
+                                                                        PrinterUpdate();
+                                                                    });
             _updateTime.Start();
         }
 
@@ -84,14 +90,12 @@ namespace SpoolerMasterUltimate
                 (SolidColorBrush) new BrushConverter().ConvertFrom("#" + _settingsWindowAccess.Settings.DateTextColor);
             LblTime.Foreground =
                 (SolidColorBrush) new BrushConverter().ConvertFrom("#" + _settingsWindowAccess.Settings.TimeTextColor);
-            LblDate.Content = _currentDateTime.DayOfWeek + ", " + DateTime.Now.ToString("MMMM") + " (" +
-                              _currentDateTime.Month +
-                              "/" + _currentDateTime.Day + "/" +
-                              _currentDateTime.Year + ")";
-            LblTime.Content = _currentDateTime.ToString("hh:mm:ss tt");
+
             LblTime.FontSize = _settingsWindowAccess.Settings.TimeFontSize;
             LblDate.FontSize = _settingsWindowAccess.Settings.DateFontSize;
             BrdrBackground.Background.Opacity = _settingsWindowAccess.Settings.WindowOpacityPercentage/100.0;
+            _updateTime.Interval = _settingsWindowAccess.Settings.UpdateInterval;
+            _settingsWindowAccess.Settings.IsChangeMade = false;
         }
 
         /// <summary>
@@ -99,7 +103,7 @@ namespace SpoolerMasterUltimate
         ///     (lblPrinterStatus, lvPrintMonitor, and _printManager)
         /// </summary>
         private void PrinterUpdate() {
-            isPrintManaging = true;
+            _isPrintManaging = true;
             _printManager.IsPrinterListCollected = false;
             if (_printManager.PrinterWindow.PrinterGet) {
                 _printManager.PrinterWindow.PrinterGet = false;
@@ -110,7 +114,7 @@ namespace SpoolerMasterUltimate
             else if (_printManager.IsPrinterConnected) SetPrintStatus();
             LblPrinterStatus.Content = _printManager.CurrentPrinterStatus();
             LvPrintMonitor.SelectedIndex = _selectedJob;
-            isPrintManaging = false;
+            _isPrintManaging = false;
         }
 
         /// <summary>
@@ -118,7 +122,9 @@ namespace SpoolerMasterUltimate
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Window_MouseDown(object sender, MouseButtonEventArgs e) { if (e.ChangedButton == MouseButton.Left) DragMove(); }
+        private void Window_MouseDown(object sender, MouseButtonEventArgs e) {
+            if (e.ChangedButton == MouseButton.Left) DragMove();
+        }
 
         /// <summary>
         ///     In context-menu item
@@ -165,7 +171,7 @@ namespace SpoolerMasterUltimate
         private void MainWindow_OnClosing(object sender, CancelEventArgs e) {
             try {
                 var saveSettings = _settingsWindowAccess.Settings;
-                var writer = new XmlSerializer(typeof (SettingsInfo));
+                var writer = new XmlSerializer(typeof(SettingsInfo));
                 var file = File.Create(_path);
                 writer.Serialize(file, saveSettings);
                 file.Close();

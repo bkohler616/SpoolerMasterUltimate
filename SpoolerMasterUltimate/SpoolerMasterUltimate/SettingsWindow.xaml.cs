@@ -64,6 +64,7 @@ namespace SpoolerMasterUltimate
             TbTimeFontSize.Text = Settings.TimeFontSize.ToString();
             TbBackgroundOpacity.Text = Settings.WindowOpacityPercentage.ToString();
             CbClickThrough.IsChecked = Settings.ClickThrough;
+            TbInternalUpdate.Text = Settings.UpdateInterval.ToString();
         }
 
         /// <summary>
@@ -91,6 +92,7 @@ namespace SpoolerMasterUltimate
 
             var errorList = "Error(s):";
             var printErrorIfTrue = false;
+            Settings.IsChangeMade = true;
 
             #endregion
 
@@ -165,8 +167,8 @@ namespace SpoolerMasterUltimate
             }
 
             #endregion
-
-            //Opacity Check
+            
+            #region opacity
             try {
                 if (!CheckInt(TbBackgroundOpacity.Text))
                     throw new Exception("\n-Opacity is not a proper value. Please only use whole numbers.");
@@ -182,6 +184,24 @@ namespace SpoolerMasterUltimate
                 errorList += ex.Message;
                 printErrorIfTrue = true;
                 Settings.DefaultOpacityPercentage();
+            }
+            #endregion
+
+            try {
+                if (!CheckInt(TbInternalUpdate.Text))
+                    throw new Exception("\n-Update Interval is not a proper value. Please only use whole numbers.");
+                int updateInterval;
+                var parseSuccess = int.TryParse(TbInternalUpdate.Text, out updateInterval);
+                if (!parseSuccess)
+                    throw new Exception("\n-Update Interval is not a proper value. Please only use whole numbers.");
+                if (!(updateInterval > 200 && updateInterval < 2001))
+                    throw new Exception("\n-Update Interval is out of range. Please use numbers in between 199 and 2001");
+                Settings.UpdateInterval = updateInterval;
+            }
+            catch (Exception ex) {
+                errorList += ex.Message;
+                printErrorIfTrue = true;
+                Settings.DefaultUpdateInterval();
             }
 
             if (CbClickThrough.IsChecked != null)
